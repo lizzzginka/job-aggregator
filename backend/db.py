@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import datetime
-
+from werkzeug.security import check_password_hash
 
 def init_db():
     conn = sqlite3.connect('vacancies.db')
@@ -84,8 +84,7 @@ def add_vacancies(vacancies):
 def get_vacancies():
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
-    cursor.execute(
-        'SELECT id, title, company, salary, experience, url, published_at FROM vacancies ORDER BY published_at DESC')
+    cursor.execute('SELECT id, title, company, salary, experience, url, published_at FROM vacancies ORDER BY published_at DESC')
     vacancies = cursor.fetchall()
     conn.close()
     return [{
@@ -95,7 +94,7 @@ def get_vacancies():
         'salary': v[3] if v[3] else 'не указана',
         'experience': v[4] if v[4] else 'не указан',
         'url': v[5],
-        'published_at': v[6]
+        'published_at': v[6] if v[6] else 'не указана'
     } for v in vacancies]
 
 
@@ -140,17 +139,19 @@ def get_user(full_name, password, user_type):
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
     cursor.execute('''
-        SELECT id, full_name, group_number, user_type FROM users 
-        WHERE full_name = ? AND password = ? AND user_type = ?
-    ''', (full_name, password, user_type))
-    user = cursor.fetchone()
+        SELECT id, full_name, group_number, password, user_type 
+        FROM users 
+        WHERE full_name = ? AND user_type = ?
+    ''', (full_name, user_type))
+    user_data = cursor.fetchone()
     conn.close()
-    if user:
+
+    if user_data and check_password_hash(user_data[3], password):
         return {
-            'id': user[0],
-            'full_name': user[1],
-            'group_number': user[2],
-            'user_type': user[3]
+            'id': user_data[0],
+            'full_name': user_data[1],
+            'group_number': user_data[2],
+            'user_type': user_data[4]
         }
     return None
 

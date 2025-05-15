@@ -3,41 +3,47 @@
 {% block title %}Список вакансий{% endblock %}
 
 {% block content %}
-    <h1 class="mb-4">Список вакансий</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Список вакансий</h1>
+        {% if 'user_id' in session %}
+            <a href="{{ url_for('favorites') }}" class="btn btn-primary">Избранное</a>
+        {% endif %}
+    </div>
 
     <div class="row">
         {% for vacancy in vacancies %}
             <div class="col-md-6 mb-4">
-                <div class="card vacancy-card {% if employment and employment.id == vacancy.id %}employment-marked{% endif %}">
-                    <div class="card-header vacancy-header">
-                        <h5 class="card-title mb-0">{{ vacancy.title }}</h5>
-                        <p class="card-subtitle text-muted mb-0">{{ vacancy.company }}</p>
-                    </div>
-                    <div class="card-body vacancy-body">
-                        <p class="card-text">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ vacancy.title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ vacancy.company }}</h6>
+                        <div class="card-text mb-2">
                             <strong>Зарплата:</strong> {{ vacancy.salary }}<br>
-                            <strong>Опыт:</strong> {{ vacancy.experience }}<br>
                             <strong>Дата публикации:</strong> {{ vacancy.published_at }}<br>
-                        </p>
-                        <p class="card-text">{{ vacancy.description|truncate(200) }}</p>
-                    </div>
-                    <div class="card-footer vacancy-footer d-flex justify-content-between align-items-center">
-                        <a href="{{ vacancy.url }}" target="_blank" class="btn btn-sm btn-primary">Подробнее</a>
+                            <strong>Ссылка:</strong> <a href="{{ vacancy.url }}" target="_blank">{{ vacancy.url|truncate(30) }}</a>
+                        </div>
 
-                        <div class="d-flex">
-                            {% if 'user_id' in session %}
-                                <button class="btn btn-sm favorite-btn me-2 {% if vacancy.id in favorites %}active{% endif %}" data-vacancy-id="{{ vacancy.id }}">
-                                    <i class="bi {% if vacancy.id in favorites %}bi-star-fill{% else %}bi-star{% endif %}"></i>
-                                    {% if vacancy.id in favorites %}В избранном{% else %}Добавить в избранное{% endif %}
-                                </button>
-
-                                {% if user.user_type == 'student' %}
-                                    <button class="btn btn-sm employment-btn {% if employment and employment.id == vacancy.id %}btn-success{% else %}btn-outline-success{% endif %}" data-vacancy-id="{{ vacancy.id }}">
-                                        {% if employment and employment.id == vacancy.id %}Отмечено{% else %}Отметить трудоустройство{% endif %}
-                                    </button>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button class="btn btn-sm btn-outline-secondary toggle-favorite"
+                                    data-vacancy-id="{{ vacancy.id }}"
+                                    data-is-favorite="{{ 'true' if vacancy.id in favorites else 'false' }}">
+                                {% if vacancy.id in favorites %}
+                                    <i class="bi bi-star-fill"></i> В избранном
+                                {% else %}
+                                    <i class="bi bi-star"></i> Добавить в избранное
                                 {% endif %}
-                            {% else %}
-                                <small class="text-muted">Войдите, чтобы добавить в избранное</small>
+                            </button>
+
+                            {% if user and user.user_type == 'student' %}
+                                <button class="btn btn-sm {% if employment and employment.id == vacancy.id %}btn-success{% else %}btn-outline-success{% endif %} toggle-employment"
+                                        data-vacancy-id="{{ vacancy.id }}"
+                                        data-is-employed="{{ 'true' if employment and employment.id == vacancy.id else 'false' }}">
+                                    {% if employment and employment.id == vacancy.id %}
+                                        <i class="bi bi-check-circle"></i> Отмечено
+                                    {% else %}
+                                        Отметить трудоустройство
+                                    {% endif %}
+                                </button>
                             {% endif %}
                         </div>
                     </div>
@@ -45,4 +51,72 @@
             </div>
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function() {
+            // Обработка избранного
+            $('.toggle-favorite').click(function() {
+                const vacancyId = $(this).data('vacancy-id');
+                const isFavorite = $(this).data('is-favorite') === 'true';
+
+                $.ajax({
+                    url: '/toggle_favorite/' + vacancyId,
+                    method: 'POST',
+                    success: function(response) {
+                        if (response.status === 'added') {
+                            $(`.toggle-favorite[data-vacancy-id="${vacancyId}"]`)
+                                .html('<i class="bi bi-star-fill"></i> В избранном')
+                                .data('is-favorite', 'true');
+                        } else if (response.status === 'removed') {
+                            $(`.toggle-favorite[data-vacancy-id="${vacancyId}"]`)
+                                .html('<i class="bi bi-star"></i> Добавить в избранное')
+                                .data('is-favorite', 'false');
+                        }
+                    }
+                });
+            });
+
+            // Обработка трудоустройства
+            $('.toggle-employment').click(function() {
+                const vacancyId = $(this).data('vacancy-id');
+                const isEmployed = $(this).data('is-employed') === 'true';
+
+                if (!isEmployed) {
+                    if (!confirm('Вы хотите отметить эту вакансию?')) {
+                        return;
+                    }
+                }
+
+                $.ajax({
+                    url: '/toggle_employment/' + vacancyId,
+                    method: 'POST',
+                    success: function(response) {
+                        if (response.status === 'added') {
+                            $('.toggle-employment')
+                                .removeClass('btn-success')
+                                .addClass('btn-outline-success')
+                                .html('Отметить трудоустройство')
+                                .data('is-employed', 'false');
+
+                            $(`.toggle-employment[data-vacancy-id="${vacancyId}"]`)
+                                .removeClass('btn-outline-success')
+                                .addClass('btn-success')
+                                .html('<i class="bi bi-check-circle"></i> Отмечено')
+                                .data('is-employed', 'true');
+                        } else if (response.status === 'removed') {
+                            $(`.toggle-employment[data-vacancy-id="${vacancyId}"]`)
+                                .removeClass('btn-success')
+                                .addClass('btn-outline-success')
+                                .html('Отметить трудоустройство')
+                                .data('is-employed', 'false');
+                        } else if (response.error) {
+                            alert(response.error);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

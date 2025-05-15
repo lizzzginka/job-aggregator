@@ -5,3 +5,4 @@ apscheduler==3.10.1
 pandas==1.5.3
 openpyxl==3.0.10
 XlsxWriter==3.0.3
+Werkzeug>=2.0.0

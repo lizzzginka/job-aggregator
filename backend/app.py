@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Flask, render_template, redirect, url_for, request, jsonify, session, flash, make_response
 from flask_cors import CORS
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -5,33 +6,30 @@ import atexit
 from hh_parser import parse_vacancies
 from db import (
     init_db, add_vacancies, get_vacancies, get_vacancy_by_id,
-    add_user, get_user, update_user_login, get_all_users,
+    add_user, get_user, update_user_login, init_db, get_all_users,
     add_favorite, remove_favorite, get_favorites, is_favorite,
     set_employment, remove_employment, get_employment, get_all_employments
 )
 from datetime import datetime, timedelta
 import pandas as pd
 from io import BytesIO
+from werkzeug.security import generate_password_hash
 
-# Инициализация Flask приложения
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'  # Важно заменить на надежный ключ в продакшене
-app.permanent_session_lifetime = timedelta(hours=1)  # Сессия истекает через 1 час бездействия
-CORS(app)  # Разрешаем CORS
+app.secret_key = '987654321'
+app.permanent_session_lifetime = timedelta(hours=1)
+CORS(app)
 
-# Инициализация базы данных
 init_db()
 
 
 def update_vacancies():
-    """Обновление списка вакансий"""
     print("Обновление вакансий...")
     new_vacancies = parse_vacancies()
     add_vacancies(new_vacancies)
     print(f"Добавлено: {len(new_vacancies)} вакансий")
 
 
-# Настройка планировщика
 scheduler = BackgroundScheduler()
 scheduler.add_job(update_vacancies, 'interval', minutes=60)
 scheduler.start()
@@ -40,11 +38,86 @@ atexit.register(lambda: scheduler.shutdown())
 
 @app.before_request
 def before_request():
-    # Обновляем время последней активности в сессии
     session.permanent = True
     session.modified = True
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if 'user_id' in session:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        full_name = request.form.get('full_name')
+        password = request.form.get('password')
+        user_type = request.form.get('user_type')
+
+        user = get_user(full_name, password, user_type)
+        if user:
+            session['user_id'] = user['id']
+            return redirect(url_for('index'))
+        else:
+            flash('Неверные данные для входа', 'danger')
+
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    flash('Вы вышли из системы', 'info')
+    return redirect(url_for('index'))
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if 'user_id' in session:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        full_name = request.form.get('full_name')
+        group_number = request.form.get('group_number')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        user_type = request.form.get('user_type')
+        registration_code = request.form.get('registration_code', '')
+
+        errors = []
+
+        # Валидация данных
+        if not full_name:
+            errors.append('ФИО обязательно для заполнения')
+
+        if user_type == 'student':
+            if not group_number or not group_number.isdigit() or len(group_number) != 3:
+                errors.append('Номер группы должен быть трехзначным числом')
+        elif user_type == 'university':
+            if registration_code != '987654321':
+                errors.append('Неверный код регистрации')
+
+        if not password or len(password) < 6:
+            errors.append('Пароль должен содержать не менее 6 символов')
+        elif password != confirm_password:
+            errors.append('Пароли не совпадают')
+
+        if not errors:
+            # Хешируем пароль перед сохранением
+            hashed_password = generate_password_hash(password)
+
+            if user_type == 'university':
+                group_number = None
+
+            user_id = add_user(full_name, group_number, hashed_password, user_type)
+            if user_id:
+                flash('Регистрация прошла успешно. Теперь вы можете войти.', 'success')
+                return redirect(url_for('login'))
+            else:
+                errors.append('Пользователь с такими данными уже существует')
+
+        for error in errors:
+            flash(error, 'danger')
+
+    return render_template('register.html')
 @app.route('/')
 def index():
     vacancies = get_vacancies()
@@ -75,89 +148,19 @@ def favorites():
         return redirect(url_for('login'))
 
     employment = get_employment(user['id'])
-    favorites = get_favorites(user['id'])
+    fav_vacancies = get_favorites(user['id'])
 
     # Если есть трудоустройство, перемещаем его в начало списка
     if employment:
-        employment_in_favorites = next((f for f in favorites if f['id'] == employment['vacancy_id']), None)
-        if employment_in_favorites:
-            favorites.remove(employment_in_favorites)
-            favorites.insert(0, employment_in_favorites)
+        employment_vacancy = next((v for v in fav_vacancies if v['id'] == employment['id']), None)
+        if employment_vacancy:
+            fav_vacancies.remove(employment_vacancy)
+            fav_vacancies.insert(0, employment_vacancy)
 
     return render_template('favorites.html',
-                           favorites=favorites,
+                           favorites=fav_vacancies,
                            user=user,
                            employment=employment)
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        full_name = request.form.get('full_name')
-        password = request.form.get('password')
-        user_type = request.form.get('user_type')
-
-        user = get_user(full_name, password, user_type)
-        if user:
-            session['user_id'] = user['id']
-            update_user_login(user['id'])
-            flash('Вы успешно вошли в систему', 'success')
-            return redirect(url_for('index'))
-        else:
-            flash('Неверные данные для входа', 'danger')
-
-    return render_template('login.html')
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        full_name = request.form.get('full_name')
-        group_number = request.form.get('group_number')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        user_type = request.form.get('user_type')
-        registration_code = request.form.get('registration_code', '')
-
-        errors = []
-
-        if not full_name:
-            errors.append('ФИО обязательно для заполнения')
-
-        if user_type == 'student':
-            if not group_number or not group_number.isdigit() or len(group_number) != 3:
-                errors.append('Номер группы должен быть трехзначным числом')
-        elif user_type == 'university':
-            if registration_code != '987654321':
-                errors.append('Неверный код регистрации')
-
-        if not password or len(password) < 6:
-            errors.append('Пароль должен содержать не менее 6 символов')
-        elif password != confirm_password:
-            errors.append('Пароли не совпадают')
-
-        if not errors:
-            if user_type == 'university':
-                group_number = None
-
-            user_id = add_user(full_name, group_number, password, user_type)
-            if user_id:
-                flash('Регистрация прошла успешно. Теперь вы можете войти.', 'success')
-                return redirect(url_for('login'))
-            else:
-                errors.append('Пользователь с такими данными уже существует')
-
-        for error in errors:
-            flash(error, 'danger')
-
-    return render_template('register.html')
-
-
-@app.route('/logout')
-def logout():
-    session.pop('user_id', None)
-    flash('Вы вышли из системы', 'info')
-    return redirect(url_for('index'))
 
 
 @app.route('/toggle_favorite/<int:vacancy_id>', methods=['POST'])
@@ -209,7 +212,6 @@ def toggle_employment(vacancy_id):
         else:
             return jsonify({'error': 'Не удалось отметить трудоустройство'}), 500
 
-
 @app.route('/user_activity')
 def user_activity():
     if 'user_id' not in session:
@@ -247,18 +249,15 @@ def download_employment_report():
 
     employments = get_all_employments()
 
-    # Создаем DataFrame
     df = pd.DataFrame(employments)
     df.columns = ['ФИО студента', 'Группа', 'Вакансия', 'Компания', 'Ссылка']
 
-    # Создаем Excel файл в памяти
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     df.to_excel(writer, sheet_name='Трудоустройства', index=False)
     writer.close()
     output.seek(0)
 
-    # Создаем ответ
     response = make_response(output.getvalue())
     response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     response.headers['Content-Disposition'] = 'attachment; filename=employment_report.xlsx'
@@ -285,5 +284,5 @@ def get_user_by_id(user_id):
 
 
 if __name__ == '__main__':
-    update_vacancies()  # Первоначальное обновление
+    update_vacancies()
     app.run(debug=True)
