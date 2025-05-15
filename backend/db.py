@@ -134,6 +134,22 @@ def add_user(full_name, group_number, password, user_type):
     finally:
         conn.close()
 
+def get_all_students_with_last_login():
+    conn = sqlite3.connect('vacancies.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT full_name, group_number, last_login 
+        FROM users 
+        WHERE user_type = 'student'
+        ORDER BY group_number, full_name
+    ''')
+    students = cursor.fetchall()
+    conn.close()
+    return [{
+        'full_name': s[0],
+        'group_number': s[1],
+        'last_login': s[2]
+    } for s in students]
 
 def get_user_by_id(user_id):
     conn = sqlite3.connect('vacancies.db')
@@ -222,9 +238,16 @@ def add_favorite(user_id, vacancy_id):
 def remove_favorite(user_id, vacancy_id):
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
-    cursor.execute('DELETE FROM favorites WHERE user_id = ? AND vacancy_id = ?', (user_id, vacancy_id))
-    conn.commit()
-    conn.close()
+    try:
+        cursor.execute('DELETE FROM favorites WHERE user_id = ? AND vacancy_id = ?',
+                      (user_id, vacancy_id))
+        conn.commit()
+        return cursor.rowcount > 0  # Возвращает True если удаление прошло успешно
+    except sqlite3.Error as e:
+        print(f"Ошибка при удалении из избранного: {e}")
+        return False
+    finally:
+        conn.close()
 
 
 def get_favorites(user_id):

@@ -11,10 +11,12 @@ from db import (
     set_employment, remove_employment, get_employment, get_all_employments
 )
 from datetime import datetime, timedelta
-import pandas as pd
+
 from io import BytesIO
 from werkzeug.security import generate_password_hash
-
+from datetime import datetime, timedelta
+import pytz
+from io import StringIO
 app = Flask(__name__)
 app.secret_key = '987654321'
 app.permanent_session_lifetime = timedelta(hours=1)
@@ -264,6 +266,25 @@ def toggle_employment(vacancy_id):
         set_employment(user['id'], vacancy_id)
         return jsonify({'status': 'added'})
 
+
+# Добавим временную зону
+chelyabinsk_tz = pytz.timezone('Asia/Yekaterinburg')  # Челбинское время (UTC+5)
+
+
+@app.route('/remove_favorite/<int:vacancy_id>', methods=['POST'])
+def remove_favorite_route(vacancy_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Требуется авторизация'}), 401
+
+    user_id = session['user_id']
+
+    # Проверяем, существует ли вакансия в избранном
+    if not is_favorite(user_id, vacancy_id):
+        return jsonify({'error': 'Вакансия не найдена в избранном'}), 404
+
+    remove_favorite(user_id, vacancy_id)
+    return jsonify({'status': 'removed'})
+
 @app.route('/user_activity')
 def user_activity():
     if 'user_id' not in session:
@@ -273,10 +294,28 @@ def user_activity():
     if not user or user['user_type'] != 'university':
         return redirect(url_for('index'))
 
-    users = get_all_users()
-    return render_template('user_activity.html', users=users, user=user)
+    students = get_all_students_with_last_login()
 
+    # Конвертируем время в челябинское
+    for student in students:
+        if student['last_login']:
+            try:
+                # Парсим время с учетом возможных форматов
+                if 'T' in student['last_login']:
+                    dt = datetime.strptime(student['last_login'], '%Y-%m-%dT%H:%M:%S.%f')
+                else:
+                    dt = datetime.strptime(student['last_login'], '%Y-%m-%d %H:%M:%S')
 
+                utc_time = pytz.utc.localize(dt)
+                local_time = utc_time.astimezone(chelyabinsk_tz)
+                student['last_login'] = local_time.strftime('%d.%m.%Y %H:%M')
+            except ValueError as e:
+                student['last_login'] = 'Неверный формат времени'
+                print(f"Ошибка форматирования времени: {e}")
+
+    return render_template('user_activity.html',
+                           students=students,
+                           user=user)
 @app.route('/employment_report')
 def employment_report():
     if 'user_id' not in session:
@@ -288,6 +327,42 @@ def employment_report():
 
     employments = get_all_employments()
     return render_template('employment_report.html', employments=employments, user=user)
+
+def get_all_students_with_last_login():
+    conn = sqlite3.connect('vacancies.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT full_name, group_number, last_login 
+        FROM users 
+        WHERE user_type = 'student'
+        ORDER BY group_number, full_name
+    ''')
+    students = cursor.fetchall()
+    conn.close()
+    return [{
+        'full_name': s[0],
+        'group_number': s[1],
+        'last_login': s[2]
+    } for s in students]
+
+def get_all_employments():
+    conn = sqlite3.connect('vacancies.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT u.full_name, u.group_number, v.company, v.url
+        FROM employment e
+        JOIN users u ON e.user_id = u.id
+        JOIN vacancies v ON e.vacancy_id = v.id
+        ORDER BY u.group_number, u.full_name
+    ''')
+    employments = cursor.fetchall()
+    conn.close()
+    return [{
+        'full_name': e[0],
+        'group_number': e[1],
+        'company': e[2],
+        'url': e[3]
+    } for e in employments]
 
 
 @app.route('/download_employment_report')
@@ -301,18 +376,15 @@ def download_employment_report():
 
     employments = get_all_employments()
 
-    df = pd.DataFrame(employments)
-    df.columns = ['ФИО студента', 'Группа', 'Вакансия', 'Компания', 'Ссылка']
-
-    output = BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df.to_excel(writer, sheet_name='Трудоустройства', index=False)
-    writer.close()
-    output.seek(0)
+    # Создаем CSV без pandas
+    output = StringIO()
+    output.write("Группа,ФИО студента,Компания,Ссылка на вакансию\n")
+    for emp in employments:
+        output.write(f"{emp['group_number']},{emp['full_name']},{emp['company']},{emp['url']}\n")
 
     response = make_response(output.getvalue())
-    response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    response.headers['Content-Disposition'] = 'attachment; filename=employment_report.xlsx'
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = 'attachment; filename=employment_report.csv'
 
     return response
 

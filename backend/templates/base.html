@@ -58,10 +58,10 @@
                         </li>
                         {% if user and user.user_type == 'university' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('user_activity') }}">Вход в систему</a>
+                                <a class="nav-link" href="{{ url_for('user_activity') }}">Активность</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('employment_report') }}">Отчет о трудоустройстве</a>
+                                <a class="nav-link" href="{{ url_for('employment_report') }}">Трудоустройство</a>
                             </li>
                         {% endif %}
                     {% endif %}
@@ -121,9 +121,35 @@
                 }
             });
         });
+        // Обработка удаления из избранного
+        $(document).on('click', '.remove-favorite', function() {
+            const btn = $(this);
+            const vacancyId = btn.data('vacancy-id');
 
+            if (confirm('Удалить вакансию из избранного?')) {
+                $.ajax({
+                    url: '/remove_favorite/' + vacancyId,
+                    method: 'POST',
+                    success: function(response) {
+                        if (response.status === 'removed') {
+                            // Удаляем карточку вакансии из DOM
+                            btn.closest('.col-md-6').remove();
+
+                            // Если список пуст, показываем сообщение
+                            if ($('.col-md-6').length === 0) {
+                                $('.table-responsive').html(
+                            '<div class="alert alert-info">У вас пока нет избранных вакансий</div>'
+                                );
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('Ошибка: ' + (xhr.responseJSON?.error || 'Не удалось удалить вакансию'));
+                    }
+                });
+            }
+        });
         // Обработка трудоустройства
-        $// Обработка трудоустройства
         $('.employment-btn').click(function() {
             const btn = $(this);
             const vacancyId = btn.data('vacancy-id');

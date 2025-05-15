@@ -3,40 +3,39 @@
 {% block title %}Отчет о трудоустройстве{% endblock %}
 
 {% block content %}
-    <h1 class="mb-4">Отчет о трудоустройстве</h1>
-
-    <div class="mb-3">
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Отчет о трудоустройстве</h1>
         <a href="{{ url_for('download_employment_report') }}" class="btn btn-success">
-            Скачать отчет в Excel
+            <i class="bi bi-download"></i> Скачать отчет
         </a>
     </div>
 
     <div class="table-responsive">
         <table class="table table-striped">
-            <thead>
+            <thead class="table-dark">
                 <tr>
-                    <th>ФИО студента</th>
                     <th>Группа</th>
-                    <th>Вакансия</th>
+                    <th>ФИО студента</th>
                     <th>Компания</th>
-                    <th>Ссылка</th>
+                    <th>Ссылка на вакансию</th>
                 </tr>
             </thead>
             <tbody>
-                {% for e in employments %}
-                    <tr>
-                        <td>{{ e.full_name }}</td>
-                        <td>{{ e.group_number }}</td>
-                        <td>{{ e.title }}</td>
-                        <td>{{ e.company }}</td>
-                        <td><a href="{{ e.url }}" target="_blank">Перейти</a></td>
-                    </tr>
+                {% for emp in employments %}
+                <tr>
+                    <td>{{ emp.group_number }}</td>
+                    <td>{{ emp.full_name }}</td>
+                    <td>{{ emp.company }}</td>
+                    <td><a href="{{ emp.url }}" target="_blank">Перейти</a></td>
+                </tr>
                 {% else %}
-                    <tr>
-                        <td colspan="5" class="text-center">Нет данных о трудоустройствах</td>
-                    </tr>
+                <tr>
+                    <td colspan="4" class="text-center">Нет данных о трудоустройствах</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+</div>
 {% endblock %}
