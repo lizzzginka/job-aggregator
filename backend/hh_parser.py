@@ -196,6 +196,11 @@ def parse_vacancies() -> List[Dict[str, Any]]:
 
         if not is_it_vacancy(title, desc):
             continue
+
+        published_at = item.get('published_at')
+        if published_at:
+            published_at = datetime.strptime(published_at, '%Y-%m-%dT%H:%M:%S%z').strftime('%d.%m.%Y %H:%M')
+
         parsed.append({
             'title': title,
             'company': item.get('employer', {}).get('name', 'не указана'),
@@ -204,13 +209,11 @@ def parse_vacancies() -> List[Dict[str, Any]]:
             'url': item.get('alternate_url', '#'),
             'description': clean_description(desc),
             'type': categorize_vacancy(title, desc),
-            'published_at': item.get('published_at', '')
+            'published_at': published_at or 'не указана'
         })
     logging.info(f"Успешно отфильтровано IT-вакансий: {len(parsed)}")
     return parsed
-
 if __name__ == '__main__':
     for v in parse_vacancies()[:5]:
         print(v)
-
 

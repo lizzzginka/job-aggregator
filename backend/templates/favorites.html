@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Избранное{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Избранное</h1>
+
+    {% if not favorites %}
+        <div class="alert alert-info">У вас пока нет избранных вакансий</div>
+    {% else %}
+        <div class="row">
+            {% for vacancy in favorites %}
+                <div class="col-md-6 mb-4">
+                    <div class="card vacancy-card {% if employment and employment.id == vacancy.id %}employment-marked{% endif %}">
+                        <div class="card-header vacancy-header">
+                            <h5 class="card-title mb-0">{{ vacancy.title }}</h5>
+                            <p class="card-subtitle text-muted mb-0">{{ vacancy.company }}</p>
+                        </div>
+                        <div class="card-body vacancy-body">
+                            <p class="card-text">
+                                <strong>Зарплата:</strong> {{ vacancy.salary }}<br>
+                                <strong>Опыт:</strong> {{ vacancy.experience }}<br>
+                                <strong>Дата публикации:</strong> {{ vacancy.published_at }}<br>
+                            </p>
+                            <p class="card-text">{{ vacancy.description|truncate(200) }}</p>
+                        </div>
+                        <div class="card-footer vacancy-footer d-flex justify-content-between align-items-center">
+                            <a href="{{ vacancy.url }}" target="_blank" class="btn btn-sm btn-primary">Подробнее</a>
+
+                            <div class="d-flex">
+                                <button class="btn btn-sm favorite-btn active me-2" data-vacancy-id="{{ vacancy.id }}">
+                                    <i class="bi bi-star-fill"></i> В избранном
+                                </button>
+
+                                {% if user.user_type == 'student' %}
+                                    <button class="btn btn-sm employment-btn {% if employment and employment.id == vacancy.id %}btn-success{% else %}btn-outline-success{% endif %}" data-vacancy-id="{{ vacancy.id }}">
+                                        {% if employment and employment.id == vacancy.id %}Отмечено{% else %}Отметить трудоустройство{% endif %}
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Отчет о трудоустройстве{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Отчет о трудоустройстве</h1>
+
+    <div class="mb-3">
+        <a href="{{ url_for('download_employment_report') }}" class="btn btn-success">
+            Скачать отчет в Excel
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ФИО студента</th>
+                    <th>Группа</th>
+                    <th>Вакансия</th>
+                    <th>Компания</th>
+                    <th>Ссылка</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in employments %}
+                    <tr>
+                        <td>{{ e.full_name }}</td>
+                        <td>{{ e.group_number }}</td>
+                        <td>{{ e.title }}</td>
+                        <td>{{ e.company }}</td>
+                        <td><a href="{{ e.url }}" target="_blank">Перейти</a></td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Нет данных о трудоустройствах</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

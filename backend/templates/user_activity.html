@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Активность пользователей{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Активность пользователей</h1>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ФИО</th>
+                    <th>Группа</th>
+                    <th>Тип пользователя</th>
+                    <th>Последний вход</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                    <tr>
+                        <td>{{ u.full_name }}</td>
+                        <td>{{ u.group_number if u.group_number else '-' }}</td>
+                        <td>
+                            {% if u.user_type == 'student' %}
+                                Студент
+                            {% else %}
+                                Представитель университета
+                            {% endif %}
+                        </td>
+                        <td>{{ u.last_login if u.last_login else 'Никогда' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

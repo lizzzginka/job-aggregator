@@ -41,3 +41,276 @@
 2025-04-22 16:45:18,881 - INFO - 127.0.0.1 - - [22/Apr/2025 16:45:18] "GET /vacancies HTTP/1.1" 200 -
 2025-04-22 17:08:19,935 - INFO - Scheduler has been shut down
 2025-04-22 17:08:19,989 - INFO - Scheduler has been shut down
+2025-05-15 17:52:43,277 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-05-15 17:52:43,279 - INFO - Added job "<lambda>" to job store "default"
+2025-05-15 17:52:43,279 - INFO - Scheduler started
+2025-05-15 17:52:43,310 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-15 17:52:43,310 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-15 17:52:43,312 - INFO -  * Restarting with stat
+2025-05-15 17:52:44,512 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-05-15 17:52:44,513 - INFO - Added job "<lambda>" to job store "default"
+2025-05-15 17:52:44,513 - INFO - Scheduler started
+2025-05-15 17:52:44,527 - WARNING -  * Debugger is active!
+2025-05-15 17:52:44,530 - INFO -  * Debugger PIN: 388-755-087
+2025-05-15 17:52:52,315 - INFO - 127.0.0.1 - - [15/May/2025 17:52:52] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2025-05-15 17:52:52,414 - INFO - 127.0.0.1 - - [15/May/2025 17:52:52] "GET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-05-15 17:52:52,429 - INFO - 127.0.0.1 - - [15/May/2025 17:52:52] "GET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-05-15 17:52:52,468 - INFO - 127.0.0.1 - - [15/May/2025 17:52:52] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-05-15 17:52:52,482 - INFO - 127.0.0.1 - - [15/May/2025 17:52:52] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-15 17:55:51,454 - INFO - 127.0.0.1 - - [15/May/2025 17:55:51] "GET / HTTP/1.1" 200 -
+2025-05-15 17:55:51,490 - INFO - 127.0.0.1 - - [15/May/2025 17:55:51] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-05-15 17:55:51,490 - INFO - 127.0.0.1 - - [15/May/2025 17:55:51] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-05-15 17:55:52,397 - INFO - 127.0.0.1 - - [15/May/2025 17:55:52] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-15 17:56:01,347 - INFO - 127.0.0.1 - - [15/May/2025 17:56:01] "GET /register HTTP/1.1" 200 -
+2025-05-15 17:56:01,359 - INFO - 127.0.0.1 - - [15/May/2025 17:56:01] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 17:56:01,360 - INFO - 127.0.0.1 - - [15/May/2025 17:56:01] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 17:56:37,053 - INFO - 127.0.0.1 - - [15/May/2025 17:56:37] "[32mPOST /register HTTP/1.1[0m" 302 -
+2025-05-15 17:56:37,061 - INFO - 127.0.0.1 - - [15/May/2025 17:56:37] "GET /login HTTP/1.1" 200 -
+2025-05-15 17:56:37,081 - INFO - 127.0.0.1 - - [15/May/2025 17:56:37] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 17:56:37,081 - INFO - 127.0.0.1 - - [15/May/2025 17:56:37] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 17:56:46,765 - INFO - 127.0.0.1 - - [15/May/2025 17:56:46] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-05-15 17:56:46,788 - INFO - 127.0.0.1 - - [15/May/2025 17:56:46] "GET /vacancies HTTP/1.1" 200 -
+2025-05-15 17:56:46,810 - INFO - 127.0.0.1 - - [15/May/2025 17:56:46] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 17:56:46,826 - INFO - 127.0.0.1 - - [15/May/2025 17:56:46] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 17:58:13,585 - INFO - 127.0.0.1 - - [15/May/2025 17:58:13] "GET /vacancies HTTP/1.1" 200 -
+2025-05-15 17:58:13,601 - INFO - 127.0.0.1 - - [15/May/2025 17:58:13] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 17:58:13,606 - INFO - 127.0.0.1 - - [15/May/2025 17:58:13] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 17:58:14,937 - INFO - 127.0.0.1 - - [15/May/2025 17:58:14] "GET /favorites HTTP/1.1" 200 -
+2025-05-15 17:58:14,953 - INFO - 127.0.0.1 - - [15/May/2025 17:58:14] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 17:58:14,963 - INFO - 127.0.0.1 - - [15/May/2025 17:58:14] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 17:58:17,667 - INFO - 127.0.0.1 - - [15/May/2025 17:58:17] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-05-15 17:58:17,674 - INFO - 127.0.0.1 - - [15/May/2025 17:58:17] "GET /vacancies HTTP/1.1" 200 -
+2025-05-15 17:58:17,687 - INFO - 127.0.0.1 - - [15/May/2025 17:58:17] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 17:58:17,688 - INFO - 127.0.0.1 - - [15/May/2025 17:58:17] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 17:58:23,995 - INFO - 127.0.0.1 - - [15/May/2025 17:58:23] "GET /register HTTP/1.1" 200 -
+2025-05-15 17:58:24,010 - INFO - 127.0.0.1 - - [15/May/2025 17:58:24] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 17:58:24,011 - INFO - 127.0.0.1 - - [15/May/2025 17:58:24] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 18:01:08,717 - INFO - 127.0.0.1 - - [15/May/2025 18:01:08] "POST /register HTTP/1.1" 200 -
+2025-05-15 18:01:08,730 - INFO - 127.0.0.1 - - [15/May/2025 18:01:08] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:01:08,731 - INFO - 127.0.0.1 - - [15/May/2025 18:01:08] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 18:08:43,975 - INFO - 127.0.0.1 - - [15/May/2025 18:08:43] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-15 18:14:41,749 - INFO -  * Detected change in 'D:\\PyCharm 2024.3.3\\PythonProject\\job_aggregator\\backend\\db.py', reloading
+2025-05-15 18:14:41,750 - INFO - Scheduler has been shut down
+2025-05-15 18:14:41,995 - INFO -  * Restarting with stat
+2025-05-15 18:14:43,806 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-05-15 18:14:43,808 - INFO - Added job "<lambda>" to job store "default"
+2025-05-15 18:14:43,808 - INFO - Scheduler started
+2025-05-15 18:14:43,830 - WARNING -  * Debugger is active!
+2025-05-15 18:14:43,833 - INFO -  * Debugger PIN: 388-755-087
+2025-05-15 18:18:52,471 - INFO -  * Detected change in 'D:\\PyCharm 2024.3.3\\PythonProject\\job_aggregator\\backend\\app.py', reloading
+2025-05-15 18:18:52,472 - INFO - Scheduler has been shut down
+2025-05-15 18:18:52,673 - INFO -  * Restarting with stat
+2025-05-15 18:18:54,083 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-05-15 18:18:54,084 - INFO - Added job "<lambda>" to job store "default"
+2025-05-15 18:18:54,084 - INFO - Scheduler started
+2025-05-15 18:18:54,100 - WARNING -  * Debugger is active!
+2025-05-15 18:18:54,103 - INFO -  * Debugger PIN: 388-755-087
+2025-05-15 18:19:20,402 - INFO -  * Detected change in 'D:\\PyCharm 2024.3.3\\PythonProject\\job_aggregator\\backend\\app.py', reloading
+2025-05-15 18:19:20,403 - INFO - Scheduler has been shut down
+2025-05-15 18:19:20,556 - INFO -  * Restarting with stat
+2025-05-15 18:19:21,823 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-05-15 18:19:21,825 - INFO - Added job "<lambda>" to job store "default"
+2025-05-15 18:19:21,825 - INFO - Scheduler started
+2025-05-15 18:19:21,843 - WARNING -  * Debugger is active!
+2025-05-15 18:19:21,845 - INFO -  * Debugger PIN: 388-755-087
+2025-05-15 18:20:50,809 - INFO -  * Detected change in 'D:\\PyCharm 2024.3.3\\PythonProject\\job_aggregator\\backend\\app.py', reloading
+2025-05-15 18:20:50,809 - INFO - Scheduler has been shut down
+2025-05-15 18:20:50,960 - INFO -  * Restarting with stat
+2025-05-15 18:20:52,226 - INFO - Scheduler has been shut down
+2025-05-15 18:27:05,092 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-05-15 18:27:05,093 - INFO - Added job "<lambda>" to job store "default"
+2025-05-15 18:27:05,093 - INFO - Scheduler started
+2025-05-15 18:27:05,113 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-15 18:27:05,114 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-15 18:27:05,115 - INFO -  * Restarting with stat
+2025-05-15 18:27:06,290 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-05-15 18:27:06,291 - INFO - Added job "<lambda>" to job store "default"
+2025-05-15 18:27:06,291 - INFO - Scheduler started
+2025-05-15 18:27:06,306 - WARNING -  * Debugger is active!
+2025-05-15 18:27:06,308 - INFO -  * Debugger PIN: 388-755-087
+2025-05-15 18:27:20,214 - INFO - 127.0.0.1 - - [15/May/2025 18:27:20] "GET / HTTP/1.1" 200 -
+2025-05-15 18:27:20,313 - INFO - 127.0.0.1 - - [15/May/2025 18:27:20] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-05-15 18:27:20,315 - INFO - 127.0.0.1 - - [15/May/2025 18:27:20] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:27:30,294 - INFO - 127.0.0.1 - - [15/May/2025 18:27:30] "GET / HTTP/1.1" 200 -
+2025-05-15 18:27:30,341 - INFO - 127.0.0.1 - - [15/May/2025 18:27:30] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:27:30,342 - INFO - 127.0.0.1 - - [15/May/2025 18:27:30] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 18:27:34,715 - INFO - 127.0.0.1 - - [15/May/2025 18:27:34] "[35m[1mGET /register HTTP/1.1[0m" 500 -
+2025-05-15 18:27:34,726 - INFO - 127.0.0.1 - - [15/May/2025 18:27:34] "GET /register?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-05-15 18:27:34,728 - INFO - 127.0.0.1 - - [15/May/2025 18:27:34] "GET /register?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-05-15 18:27:34,736 - INFO - 127.0.0.1 - - [15/May/2025 18:27:34] "GET /register?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-05-15 18:27:34,768 - INFO - 127.0.0.1 - - [15/May/2025 18:27:34] "[36mGET /register?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-15 18:27:41,484 - INFO - 127.0.0.1 - - [15/May/2025 18:27:41] "[35m[1mGET /register HTTP/1.1[0m" 500 -
+2025-05-15 18:27:41,497 - INFO - 127.0.0.1 - - [15/May/2025 18:27:41] "[36mGET /register?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:27:41,497 - INFO - 127.0.0.1 - - [15/May/2025 18:27:41] "[36mGET /register?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-15 18:27:41,507 - INFO - 127.0.0.1 - - [15/May/2025 18:27:41] "[36mGET /register?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-15 18:27:44,590 - INFO - 127.0.0.1 - - [15/May/2025 18:27:44] "GET /login HTTP/1.1" 200 -
+2025-05-15 18:27:44,601 - INFO - 127.0.0.1 - - [15/May/2025 18:27:44] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:27:44,602 - INFO - 127.0.0.1 - - [15/May/2025 18:27:44] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 18:27:47,229 - INFO - 127.0.0.1 - - [15/May/2025 18:27:47] "[35m[1mGET /register HTTP/1.1[0m" 500 -
+2025-05-15 18:27:47,242 - INFO - 127.0.0.1 - - [15/May/2025 18:27:47] "[36mGET /register?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:27:47,243 - INFO - 127.0.0.1 - - [15/May/2025 18:27:47] "[36mGET /register?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-15 18:27:47,251 - INFO - 127.0.0.1 - - [15/May/2025 18:27:47] "[36mGET /register?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-15 18:30:07,282 - INFO -  * Detected change in 'D:\\PyCharm 2024.3.3\\PythonProject\\job_aggregator\\backend\\forms.py', reloading
+2025-05-15 18:30:07,282 - INFO - Scheduler has been shut down
+2025-05-15 18:30:07,470 - INFO -  * Restarting with stat
+2025-05-15 18:30:08,733 - INFO - Scheduler has been shut down
+2025-05-15 18:46:39,817 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-05-15 18:46:39,819 - INFO - Added job "<lambda>" to job store "default"
+2025-05-15 18:46:39,819 - INFO - Scheduler started
+2025-05-15 18:46:39,835 - WARNING -  * Debugger is active!
+2025-05-15 18:46:39,836 - INFO -  * Debugger PIN: 388-755-087
+2025-05-15 18:46:53,330 - INFO - Начало парсинга HH.ru за последние 7 дней для IT-вакансий в Челябинске
+2025-05-15 18:46:54,044 - WARNING - Город Челябинск не найден в регионе 113, используем регион
+2025-05-15 18:46:54,046 - INFO - Запрос: (программист OR разработчик) AND (стажер OR junior OR начинающий) — до 5 страниц
+2025-05-15 18:46:54,501 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 1, вакансий 50
+2025-05-15 18:46:55,976 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 2, вакансий 50
+2025-05-15 18:46:57,366 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 3, вакансий 50
+2025-05-15 18:46:58,983 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 4, вакансий 50
+2025-05-15 18:47:00,503 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 5, вакансий 50
+2025-05-15 18:47:01,511 - INFO - Запрос: 1С AND (стажер OR junior OR без опыта) — до 5 страниц
+2025-05-15 18:47:02,011 - INFO - 1С AND (стажер OR junior OR без опыта): страница 1, вакансий 50
+2025-05-15 18:47:03,565 - INFO - 1С AND (стажер OR junior OR без опыта): страница 2, вакансий 50
+2025-05-15 18:47:05,179 - INFO - 1С AND (стажер OR junior OR без опыта): страница 3, вакансий 50
+2025-05-15 18:47:06,762 - INFO - 1С AND (стажер OR junior OR без опыта): страница 4, вакансий 50
+2025-05-15 18:47:08,381 - INFO - 1С AND (стажер OR junior OR без опыта): страница 5, вакансий 50
+2025-05-15 18:47:09,383 - INFO - Запрос: (devops OR sre) AND (стажер OR junior) — до 5 страниц
+2025-05-15 18:47:09,895 - INFO - (devops OR sre) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 18:47:11,124 - INFO - (devops OR sre) AND (стажер OR junior): страница 2, вакансий 2
+2025-05-15 18:47:12,409 - INFO - (devops OR sre) AND (стажер OR junior): страница 3, вакансий 0
+2025-05-15 18:47:12,409 - INFO - Запрос: (data engineer OR etl) AND (стажер OR junior) — до 5 страниц
+2025-05-15 18:47:12,939 - INFO - (data engineer OR etl) AND (стажер OR junior): страница 1, вакансий 31
+2025-05-15 18:47:14,191 - INFO - (data engineer OR etl) AND (стажер OR junior): страница 2, вакансий 0
+2025-05-15 18:47:14,191 - INFO - Запрос: (тестировщик OR qa) AND (стажер OR junior) — до 5 страниц
+2025-05-15 18:47:14,749 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 18:47:16,301 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 2, вакансий 50
+2025-05-15 18:47:17,670 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 3, вакансий 24
+2025-05-15 18:47:18,926 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 4, вакансий 0
+2025-05-15 18:47:18,926 - INFO - Запрос: (системный администратор OR it-специалист) AND (стажер OR junior) — до 5 страниц
+2025-05-15 18:47:19,472 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 18:47:20,908 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 2, вакансий 50
+2025-05-15 18:47:22,362 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 3, вакансий 37
+2025-05-15 18:47:23,620 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 4, вакансий 0
+2025-05-15 18:47:23,620 - INFO - Всего получено вакансий (до фильтрации): 844
+2025-05-15 18:47:23,641 - INFO - Успешно отфильтровано IT-вакансий: 127
+2025-05-15 18:47:35,194 - INFO - 127.0.0.1 - - [15/May/2025 18:47:35] "[35m[1mGET /login HTTP/1.1[0m" 500 -
+2025-05-15 18:47:35,268 - INFO - 127.0.0.1 - - [15/May/2025 18:47:35] "[36mGET /login?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-15 18:47:35,269 - INFO - 127.0.0.1 - - [15/May/2025 18:47:35] "[36mGET /login?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:47:35,282 - INFO - 127.0.0.1 - - [15/May/2025 18:47:35] "[36mGET /login?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-15 18:47:35,297 - INFO - 127.0.0.1 - - [15/May/2025 18:47:35] "[36mGET /login?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-15 18:47:36,533 - INFO - 127.0.0.1 - - [15/May/2025 18:47:36] "[35m[1mGET /login HTTP/1.1[0m" 500 -
+2025-05-15 18:47:36,548 - INFO - 127.0.0.1 - - [15/May/2025 18:47:36] "[36mGET /login?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:47:36,549 - INFO - 127.0.0.1 - - [15/May/2025 18:47:36] "[36mGET /login?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-15 18:47:36,563 - INFO - 127.0.0.1 - - [15/May/2025 18:47:36] "[36mGET /login?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-15 18:47:36,575 - INFO - 127.0.0.1 - - [15/May/2025 18:47:36] "[36mGET /login?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-15 18:47:40,906 - INFO - 127.0.0.1 - - [15/May/2025 18:47:40] "GET / HTTP/1.1" 200 -
+2025-05-15 18:47:40,924 - INFO - 127.0.0.1 - - [15/May/2025 18:47:40] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:47:40,924 - INFO - 127.0.0.1 - - [15/May/2025 18:47:40] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 18:47:43,492 - INFO - 127.0.0.1 - - [15/May/2025 18:47:43] "GET / HTTP/1.1" 200 -
+2025-05-15 18:47:43,504 - INFO - 127.0.0.1 - - [15/May/2025 18:47:43] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:47:43,505 - INFO - 127.0.0.1 - - [15/May/2025 18:47:43] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 18:47:44,828 - INFO - 127.0.0.1 - - [15/May/2025 18:47:44] "GET / HTTP/1.1" 200 -
+2025-05-15 18:47:44,838 - INFO - 127.0.0.1 - - [15/May/2025 18:47:44] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-15 18:47:44,838 - INFO - 127.0.0.1 - - [15/May/2025 18:47:44] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-15 19:41:11,140 - INFO -  * Detected change in 'D:\\PyCharm 2024.3.3\\PythonProject\\job_aggregator\\backend\\db.py', reloading
+2025-05-15 19:41:11,140 - INFO - Scheduler has been shut down
+2025-05-15 19:41:15,430 - INFO - Начало парсинга HH.ru за последние 7 дней для IT-вакансий в Челябинске
+2025-05-15 19:41:16,007 - WARNING - Город Челябинск не найден в регионе 113, используем регион
+2025-05-15 19:41:16,009 - INFO - Запрос: (программист OR разработчик) AND (стажер OR junior OR начинающий) — до 5 страниц
+2025-05-15 19:41:16,301 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 1, вакансий 50
+2025-05-15 19:41:17,865 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 2, вакансий 50
+2025-05-15 19:41:19,347 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 3, вакансий 50
+2025-05-15 19:41:20,882 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 4, вакансий 50
+2025-05-15 19:41:22,421 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 5, вакансий 50
+2025-05-15 19:41:23,429 - INFO - Запрос: 1С AND (стажер OR junior OR без опыта) — до 5 страниц
+2025-05-15 19:41:24,127 - INFO - 1С AND (стажер OR junior OR без опыта): страница 1, вакансий 50
+2025-05-15 19:41:25,775 - INFO - 1С AND (стажер OR junior OR без опыта): страница 2, вакансий 50
+2025-05-15 19:41:27,518 - INFO - 1С AND (стажер OR junior OR без опыта): страница 3, вакансий 50
+2025-05-15 19:41:28,984 - INFO - 1С AND (стажер OR junior OR без опыта): страница 4, вакансий 50
+2025-05-15 19:41:30,601 - INFO - 1С AND (стажер OR junior OR без опыта): страница 5, вакансий 50
+2025-05-15 19:41:31,617 - INFO - Запрос: (devops OR sre) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:41:32,131 - INFO - (devops OR sre) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 19:41:33,354 - INFO - (devops OR sre) AND (стажер OR junior): страница 2, вакансий 3
+2025-05-15 19:41:34,606 - INFO - (devops OR sre) AND (стажер OR junior): страница 3, вакансий 0
+2025-05-15 19:41:34,607 - INFO - Запрос: (data engineer OR etl) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:41:34,937 - INFO - (data engineer OR etl) AND (стажер OR junior): страница 1, вакансий 32
+2025-05-15 19:41:36,172 - INFO - (data engineer OR etl) AND (стажер OR junior): страница 2, вакансий 0
+2025-05-15 19:41:36,172 - INFO - Запрос: (тестировщик OR qa) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:41:36,654 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 19:41:38,174 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 2, вакансий 50
+2025-05-15 19:41:39,541 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 3, вакансий 26
+2025-05-15 19:41:40,766 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 4, вакансий 0
+2025-05-15 19:41:40,767 - INFO - Запрос: (системный администратор OR it-специалист) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:41:41,173 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 19:41:42,669 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 2, вакансий 50
+2025-05-15 19:41:44,075 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 3, вакансий 37
+2025-05-15 19:41:45,513 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 4, вакансий 0
+2025-05-15 19:41:45,514 - INFO - Всего получено вакансий (до фильтрации): 848
+2025-05-15 19:41:45,535 - INFO - Успешно отфильтровано IT-вакансий: 125
+2025-05-15 19:41:45,765 - INFO - Начало парсинга HH.ru за последние 7 дней для IT-вакансий в Челябинске
+2025-05-15 19:41:46,205 - WARNING - Город Челябинск не найден в регионе 113, используем регион
+2025-05-15 19:41:46,207 - INFO - Запрос: (программист OR разработчик) AND (стажер OR junior OR начинающий) — до 5 страниц
+2025-05-15 19:41:46,529 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 1, вакансий 50
+2025-05-15 19:41:48,088 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 2, вакансий 50
+2025-05-15 19:41:49,553 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 3, вакансий 50
+2025-05-15 19:41:51,216 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 4, вакансий 50
+2025-05-15 19:41:52,691 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 5, вакансий 50
+2025-05-15 19:41:53,697 - INFO - Запрос: 1С AND (стажер OR junior OR без опыта) — до 5 страниц
+2025-05-15 19:41:54,230 - INFO - 1С AND (стажер OR junior OR без опыта): страница 1, вакансий 50
+2025-05-15 19:41:55,773 - INFO - 1С AND (стажер OR junior OR без опыта): страница 2, вакансий 50
+2025-05-15 19:41:57,388 - INFO - 1С AND (стажер OR junior OR без опыта): страница 3, вакансий 50
+2025-05-15 19:41:58,965 - INFO - 1С AND (стажер OR junior OR без опыта): страница 4, вакансий 50
+2025-05-15 19:42:00,435 - INFO - 1С AND (стажер OR junior OR без опыта): страница 5, вакансий 50
+2025-05-15 19:42:01,448 - INFO - Запрос: (devops OR sre) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:42:01,962 - INFO - (devops OR sre) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 19:42:03,186 - INFO - (devops OR sre) AND (стажер OR junior): страница 2, вакансий 3
+2025-05-15 19:42:04,448 - INFO - (devops OR sre) AND (стажер OR junior): страница 3, вакансий 0
+2025-05-15 19:42:04,448 - INFO - Запрос: (data engineer OR etl) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:42:04,860 - INFO - (data engineer OR etl) AND (стажер OR junior): страница 1, вакансий 32
+2025-05-15 19:42:06,174 - INFO - (data engineer OR etl) AND (стажер OR junior): страница 2, вакансий 0
+2025-05-15 19:42:06,174 - INFO - Запрос: (тестировщик OR qa) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:42:06,739 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 19:42:08,500 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 2, вакансий 50
+2025-05-15 19:42:09,947 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 3, вакансий 26
+2025-05-15 19:42:11,192 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 4, вакансий 0
+2025-05-15 19:42:11,192 - INFO - Запрос: (системный администратор OR it-специалист) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:42:11,670 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 19:42:13,232 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 2, вакансий 50
+2025-05-15 19:42:14,617 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 3, вакансий 37
+2025-05-15 19:42:15,879 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 4, вакансий 0
+2025-05-15 19:42:15,880 - INFO - Всего получено вакансий (до фильтрации): 848
+2025-05-15 19:42:15,891 - INFO - Успешно отфильтровано IT-вакансий: 125
+2025-05-15 19:42:16,131 - INFO - Начало парсинга HH.ru за последние 7 дней для IT-вакансий в Челябинске
+2025-05-15 19:42:16,729 - WARNING - Город Челябинск не найден в регионе 113, используем регион
+2025-05-15 19:42:16,731 - INFO - Запрос: (программист OR разработчик) AND (стажер OR junior OR начинающий) — до 5 страниц
+2025-05-15 19:42:17,117 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 1, вакансий 50
+2025-05-15 19:42:18,644 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 2, вакансий 50
+2025-05-15 19:42:20,100 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 3, вакансий 50
+2025-05-15 19:42:21,664 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 4, вакансий 50
+2025-05-15 19:42:23,150 - INFO - (программист OR разработчик) AND (стажер OR junior OR начинающий): страница 5, вакансий 50
+2025-05-15 19:42:24,152 - INFO - Запрос: 1С AND (стажер OR junior OR без опыта) — до 5 страниц
+2025-05-15 19:42:24,701 - INFO - 1С AND (стажер OR junior OR без опыта): страница 1, вакансий 50
+2025-05-15 19:42:26,253 - INFO - 1С AND (стажер OR junior OR без опыта): страница 2, вакансий 50
+2025-05-15 19:42:27,855 - INFO - 1С AND (стажер OR junior OR без опыта): страница 3, вакансий 50
+2025-05-15 19:42:29,402 - INFO - 1С AND (стажер OR junior OR без опыта): страница 4, вакансий 50
+2025-05-15 19:42:30,932 - INFO - 1С AND (стажер OR junior OR без опыта): страница 5, вакансий 50
+2025-05-15 19:42:31,947 - INFO - Запрос: (devops OR sre) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:42:32,514 - INFO - (devops OR sre) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 19:42:33,768 - INFO - (devops OR sre) AND (стажер OR junior): страница 2, вакансий 3
+2025-05-15 19:42:35,075 - INFO - (devops OR sre) AND (стажер OR junior): страница 3, вакансий 0
+2025-05-15 19:42:35,075 - INFO - Запрос: (data engineer OR etl) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:42:35,584 - INFO - (data engineer OR etl) AND (стажер OR junior): страница 1, вакансий 32
+2025-05-15 19:42:36,833 - INFO - (data engineer OR etl) AND (стажер OR junior): страница 2, вакансий 0
+2025-05-15 19:42:36,833 - INFO - Запрос: (тестировщик OR qa) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:42:37,333 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 19:42:38,877 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 2, вакансий 50
+2025-05-15 19:42:40,344 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 3, вакансий 26
+2025-05-15 19:42:41,651 - INFO - (тестировщик OR qa) AND (стажер OR junior): страница 4, вакансий 0
+2025-05-15 19:42:41,652 - INFO - Запрос: (системный администратор OR it-специалист) AND (стажер OR junior) — до 5 страниц
+2025-05-15 19:42:42,177 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 1, вакансий 50
+2025-05-15 19:42:43,884 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 2, вакансий 50
+2025-05-15 19:42:45,267 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 3, вакансий 37
+2025-05-15 19:42:46,526 - INFO - (системный администратор OR it-специалист) AND (стажер OR junior): страница 4, вакансий 0
+2025-05-15 19:42:46,526 - INFO - Всего получено вакансий (до фильтрации): 848
+2025-05-15 19:42:46,538 - INFO - Успешно отфильтровано IT-вакансий: 125

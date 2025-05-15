@@ -1,0 +1,14 @@
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+nav { background: #2c3e50; padding: 10px; }
+nav a { color: #ecf0f1; margin-right: 15px; text-decoration: none; }
+main { padding: 20px; }
+.vac-list { display: flex; flex-wrap: wrap; gap: 15px; }
+.vacancy { border: 1px solid #ddd; border-radius: 5px; padding: 15px; width: calc(33% - 30px); background: #f9f9f9; }
+.vacancy h3 { margin-top: 0; }
+button { margin-top: 10px; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; }
+.fav-btn { background: #3498db; color: #fff; }
+.emp-btn { background: #27ae60; color: #fff; }
+.emp-btn.marked { background: #2ecc71; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+table, th, td { border: 1px solid #bdc3c7; }
+th, td { padding: 8px; text-align: left; }
