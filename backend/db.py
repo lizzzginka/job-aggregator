@@ -135,6 +135,25 @@ def add_user(full_name, group_number, password, user_type):
         conn.close()
 
 
+def get_user_by_id(user_id):
+    conn = sqlite3.connect('vacancies.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT id, full_name, group_number, user_type 
+        FROM users 
+        WHERE id = ?
+    ''', (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+    if user:
+        return {
+            'id': user[0],
+            'full_name': user[1],
+            'group_number': user[2],
+            'user_type': user[3]
+        }
+    return None
+
 def get_user(full_name, password, user_type):
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
@@ -190,10 +209,8 @@ def add_favorite(user_id, vacancy_id):
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
     try:
-        cursor.execute('''
-            INSERT INTO favorites (user_id, vacancy_id, added_at)
-            VALUES (?, ?, ?)
-        ''', (user_id, vacancy_id, datetime.now().isoformat()))
+        cursor.execute('INSERT INTO favorites (user_id, vacancy_id, added_at) VALUES (?, ?, datetime("now"))',
+                      (user_id, vacancy_id))
         conn.commit()
         return True
     except sqlite3.IntegrityError:
@@ -205,9 +222,7 @@ def add_favorite(user_id, vacancy_id):
 def remove_favorite(user_id, vacancy_id):
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
-    cursor.execute('''
-        DELETE FROM favorites WHERE user_id = ? AND vacancy_id = ?
-    ''', (user_id, vacancy_id))
+    cursor.execute('DELETE FROM favorites WHERE user_id = ? AND vacancy_id = ?', (user_id, vacancy_id))
     conn.commit()
     conn.close()
 
@@ -216,7 +231,7 @@ def get_favorites(user_id):
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
     cursor.execute('''
-        SELECT v.id, v.title, v.company, v.salary, v.experience, v.url, v.published_at 
+        SELECT v.id, v.title, v.company, v.salary, v.url, v.published_at 
         FROM favorites f
         JOIN vacancies v ON f.vacancy_id = v.id
         WHERE f.user_id = ?
@@ -228,39 +243,31 @@ def get_favorites(user_id):
         'id': v[0],
         'title': v[1],
         'company': v[2],
-        'salary': v[3] if v[3] else 'не указана',
-        'experience': v[4] if v[4] else 'не указан',
-        'url': v[5],
-        'published_at': v[6]
+        'salary': v[3],
+        'url': v[4],
+        'published_at': v[5]
     } for v in vacancies]
 
 
 def is_favorite(user_id, vacancy_id):
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
-    cursor.execute('''
-        SELECT 1 FROM favorites WHERE user_id = ? AND vacancy_id = ?
-    ''', (user_id, vacancy_id))
+    cursor.execute('SELECT 1 FROM favorites WHERE user_id = ? AND vacancy_id = ?', (user_id, vacancy_id))
     result = cursor.fetchone() is not None
     conn.close()
     return result
-
 
 # Функции для работы с трудоустройством
 def set_employment(user_id, vacancy_id):
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
     try:
-        # Удаляем предыдущее трудоустройство, если есть
         cursor.execute('DELETE FROM employment WHERE user_id = ?', (user_id,))
-        # Добавляем новое
-        cursor.execute('''
-            INSERT INTO employment (user_id, vacancy_id, employed_at)
-            VALUES (?, ?, ?)
-        ''', (user_id, vacancy_id, datetime.now().isoformat()))
+        cursor.execute('INSERT INTO employment (user_id, vacancy_id, employed_at) VALUES (?, ?, datetime("now"))',
+                      (user_id, vacancy_id))
         conn.commit()
         return True
-    except sqlite3.IntegrityError:
+    except sqlite3.Error:
         return False
     finally:
         conn.close()
@@ -278,25 +285,24 @@ def get_employment(user_id):
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
     cursor.execute('''
-        SELECT v.id, v.title, v.company, v.salary, v.experience, v.url, v.published_at 
+        SELECT v.id, v.title, v.company, v.salary, v.url, v.published_at
         FROM employment e
         JOIN vacancies v ON e.vacancy_id = v.id
         WHERE e.user_id = ?
     ''', (user_id,))
-    v = cursor.fetchone()
+    result = cursor.fetchone()
     conn.close()
-    if v:
+
+    if result:
         return {
-            'id': v[0],
-            'title': v[1],
-            'company': v[2],
-            'salary': v[3] if v[3] else 'не указана',
-            'experience': v[4] if v[4] else 'не указан',
-            'url': v[5],
-            'published_at': v[6]
+            'id': result[0],
+            'title': result[1],
+            'company': result[2],
+            'salary': result[3],
+            'url': result[4],
+            'published_at': result[5]
         }
     return None
-
 
 def get_all_employments():
     conn = sqlite3.connect('vacancies.db')

@@ -25,6 +25,11 @@
                             <input type="text" class="form-control" id="full_name" name="full_name" required>
                         </div>
 
+                        <div class="mb-3" id="login_group_field">
+                            <label for="group_number" class="form-label">Номер группы</label>
+                            <input type="text" class="form-control" id="group_number" name="group_number">
+                        </div>
+
                         <div class="mb-3">
                             <label for="password" class="form-label">Пароль</label>
                             <input type="password" class="form-control" id="password" name="password" required>
@@ -33,11 +38,31 @@
                         <button type="submit" class="btn btn-primary w-100">Войти</button>
                     </form>
                 </div>
-                <div class="card-footer text-center">
-                    Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрируйтесь</a>
-                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('user_type').addEventListener('change', function() {
+        const userType = this.value;
+        const groupField = document.getElementById('login_group_field');
+
+        if (userType === 'student') {
+            groupField.classList.remove('d-none');
+            document.getElementById('group_number').required = true;
+        } else {
+            groupField.classList.add('d-none');
+            document.getElementById('group_number').required = false;
+        }
+    });
+
+    // Инициализация при загрузке
+    document.addEventListener('DOMContentLoaded', function() {
+        const groupField = document.getElementById('login_group_field');
+        if (document.getElementById('user_type').value !== 'student') {
+            groupField.classList.add('d-none');
+        }
+    });
+</script>
 {% endblock %}

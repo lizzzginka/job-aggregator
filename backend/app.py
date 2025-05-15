@@ -51,8 +51,15 @@ def login():
         full_name = request.form.get('full_name')
         password = request.form.get('password')
         user_type = request.form.get('user_type')
+        group_number = request.form.get('group_number', None)  # Добавляем группу для студентов
 
         user = get_user(full_name, password, user_type)
+
+        # Для студентов проверяем совпадение группы
+        if user and user['user_type'] == 'student' and group_number != user['group_number']:
+            flash('Неверный номер группы', 'danger')
+            return redirect(url_for('login'))
+
         if user:
             session['user_id'] = user['id']
             return redirect(url_for('index'))
@@ -60,14 +67,35 @@ def login():
             flash('Неверные данные для входа', 'danger')
 
     return render_template('login.html')
-
-
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
     flash('Вы вышли из системы', 'info')
     return redirect(url_for('index'))
 
+
+@app.route('/confirm_employment/<int:vacancy_id>', methods=['POST'])
+def confirm_employment(vacancy_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Требуется авторизация'}), 401
+
+    user = get_user_by_id(session['user_id'])
+    if not user or user['user_type'] != 'student':
+        return jsonify({'error': 'Доступ запрещен'}), 403
+
+    # Проверяем, есть ли уже трудоустройство
+    current_employment = get_employment(user['id'])
+    if current_employment:
+        return jsonify({'error': 'Вы уже отметили трудоустройство'}), 400
+
+    # Добавляем в избранное, если еще не добавлено
+    if not is_favorite(user['id'], vacancy_id):
+        add_favorite(user['id'], vacancy_id)
+
+    # Отмечаем трудоустройство
+    set_employment(user['id'], vacancy_id)
+
+    return jsonify({'status': 'success'})
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -143,48 +171,70 @@ def favorites():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    user = get_user_by_id(session['user_id'])
+    user = get_user_by_id(session['user_id'])  # Получаем данные пользователя
     if not user:
         return redirect(url_for('login'))
 
-    employment = get_employment(user['id'])
     fav_vacancies = get_favorites(user['id'])
+    employment = get_employment(user['id'])
 
-    # Если есть трудоустройство, перемещаем его в начало списка
+    # Если есть трудоустройство, перемещаем эту вакансию в начало
     if employment:
-        employment_vacancy = next((v for v in fav_vacancies if v['id'] == employment['id']), None)
-        if employment_vacancy:
-            fav_vacancies.remove(employment_vacancy)
-            fav_vacancies.insert(0, employment_vacancy)
+        # Удаляем вакансию с трудоустройством из общего списка (если она там есть)
+        fav_vacancies = [v for v in fav_vacancies if v['id'] != employment['id']]
+        # Добавляем в начало
+        fav_vacancies.insert(0, employment)
 
     return render_template('favorites.html',
                            favorites=fav_vacancies,
-                           user=user,
-                           employment=employment)
-
+                           employment=employment,
+                           user=user)  # Добавляем user в контекст
 
 @app.route('/toggle_favorite/<int:vacancy_id>', methods=['POST'])
 def toggle_favorite(vacancy_id):
     if 'user_id' not in session:
         return jsonify({'error': 'Требуется авторизация'}), 401
 
-    user = get_user_by_id(session['user_id'])
-    if not user:
-        return jsonify({'error': 'Пользователь не найден'}), 404
-
-    vacancy = get_vacancy_by_id(vacancy_id)
-    if not vacancy:
-        return jsonify({'error': 'Вакансия не найдена'}), 404
-
-    if is_favorite(user['id'], vacancy_id):
-        remove_favorite(user['id'], vacancy_id)
+    user_id = session['user_id']
+    if is_favorite(user_id, vacancy_id):
+        remove_favorite(user_id, vacancy_id)
         return jsonify({'status': 'removed'})
     else:
-        if add_favorite(user['id'], vacancy_id):
-            return jsonify({'status': 'added'})
-        else:
-            return jsonify({'error': 'Не удалось добавить в избранное'}), 500
+        add_favorite(user_id, vacancy_id)
+        return jsonify({'status': 'added'})
 
+
+@app.route('/remove_employment', methods=['POST'])
+def remove_employment_route():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Требуется авторизация'}), 401
+
+    user = get_user_by_id(session['user_id'])
+    if not user or user['user_type'] != 'student':
+        return jsonify({'error': 'Доступ запрещен'}), 403
+
+    remove_employment(user['id'])
+    return jsonify({'status': 'removed'})
+
+@app.route('/set_employment/<int:vacancy_id>', methods=['POST'])
+def set_employment_route(vacancy_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Требуется авторизация'}), 401
+
+    user = get_user_by_id(session['user_id'])
+    if not user or user['user_type'] != 'student':
+        return jsonify({'error': 'Доступ запрещен'}), 403
+
+    current_employment = get_employment(user['id'])
+    if current_employment:
+        return jsonify({'error': 'Вы уже отметили вакансию на трудоустройство'}), 400
+
+    # Добавляем в избранное, если еще не добавлена
+    if not is_favorite(user['id'], vacancy_id):
+        add_favorite(user['id'], vacancy_id)
+
+    set_employment(user['id'], vacancy_id)
+    return jsonify({'status': 'added'})
 
 @app.route('/toggle_employment/<int:vacancy_id>', methods=['POST'])
 def toggle_employment(vacancy_id):
@@ -207,10 +257,12 @@ def toggle_employment(vacancy_id):
     elif current_employment:
         return jsonify({'error': 'Вы уже отметили трудоустройство'}), 400
     else:
-        if set_employment(user['id'], vacancy_id):
-            return jsonify({'status': 'added'})
-        else:
-            return jsonify({'error': 'Не удалось отметить трудоустройство'}), 500
+        # Добавляем в избранное, если еще не добавлена
+        if not is_favorite(user['id'], vacancy_id):
+            add_favorite(user['id'], vacancy_id)
+
+        set_employment(user['id'], vacancy_id)
+        return jsonify({'status': 'added'})
 
 @app.route('/user_activity')
 def user_activity():

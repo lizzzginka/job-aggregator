@@ -5,7 +5,7 @@
 {% block content %}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Избранное</h1>
-        <a href="{{ url_for('index') }}" class="btn btn-primary">Список вакансий</a>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Назад к списку</a>
     </div>
 
     {% if not favorites %}
@@ -27,13 +27,12 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <button class="btn btn-sm btn-danger remove-favorite"
                                         data-vacancy-id="{{ vacancy.id }}">
-                                    <i class="bi bi-trash"></i> Удалить из избранного
+                                    <i class="bi bi-trash"></i> Удалить
                                 </button>
 
                                 {% if user and user.user_type == 'student' %}
-                                    <button class="btn btn-sm {% if employment and employment.id == vacancy.id %}btn-success{% else %}btn-outline-success{% endif %} toggle-employment"
-                                            data-vacancy-id="{{ vacancy.id }}"
-                                            data-is-employed="{{ 'true' if employment and employment.id == vacancy.id else 'false' }}">
+                                    <button class="btn btn-sm {% if employment and employment.id == vacancy.id %}btn-success{% else %}btn-outline-success{% endif %} employment-btn"
+                                            data-vacancy-id="{{ vacancy.id }}">
                                         {% if employment and employment.id == vacancy.id %}
                                             <i class="bi bi-check-circle"></i> Отмечено
                                         {% else %}
@@ -48,68 +47,4 @@
             {% endfor %}
         </div>
     {% endif %}
-{% endblock %}
-
-{% block scripts %}
-    <script>
-        $(document).ready(function() {
-            // Удаление из избранного
-            $('.remove-favorite').click(function() {
-                const vacancyId = $(this).data('vacancy-id');
-
-                if (confirm('Удалить вакансию из избранного?')) {
-                    $.ajax({
-                        url: '/toggle_favorite/' + vacancyId,
-                        method: 'POST',
-                        success: function(response) {
-                            if (response.status === 'removed') {
-                                location.reload();
-                            }
-                        }
-                    });
-                }
-            });
-
-            // Обработка трудоустройства (как в index.html)
-            $('.toggle-employment').click(function() {
-                const vacancyId = $(this).data('vacancy-id');
-                const isEmployed = $(this).data('is-employed') === 'true';
-
-                if (!isEmployed) {
-                    if (!confirm('Вы хотите отметить эту вакансию?')) {
-                        return;
-                    }
-                }
-
-                $.ajax({
-                    url: '/toggle_employment/' + vacancyId,
-                    method: 'POST',
-                    success: function(response) {
-                        if (response.status === 'added') {
-                            $('.toggle-employment')
-                                .removeClass('btn-success')
-                                .addClass('btn-outline-success')
-                                .html('Отметить трудоустройство')
-                                .data('is-employed', 'false');
-
-                            $(`.toggle-employment[data-vacancy-id="${vacancyId}"]`)
-                                .removeClass('btn-outline-success')
-                                .addClass('btn-success')
-                                .html('<i class="bi bi-check-circle"></i> Отмечено')
-                                .data('is-employed', 'true');
-                        } else if (response.status === 'removed') {
-                            $(`.toggle-employment[data-vacancy-id="${vacancyId}"]`)
-                                .removeClass('btn-success')
-                                .addClass('btn-outline-success')
-                                .html('Отметить трудоустройство')
-                                .data('is-employed', 'false');
-                        } else if (response.error) {
-                            alert(response.error);
-                        }
-                        location.reload();
-                    }
-                });
-            });
-        });
-    </script>
 {% endblock %}
