@@ -84,7 +84,7 @@ def add_vacancies(vacancies):
 def get_vacancies():
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT id, title, company, salary, experience, url, published_at FROM vacancies ORDER BY published_at DESC')
+    cursor.execute('SELECT id, title, company, salary, experience, url, description, published_at FROM vacancies ORDER BY published_at DESC')
     vacancies = cursor.fetchall()
     conn.close()
     return [{
@@ -94,7 +94,8 @@ def get_vacancies():
         'salary': v[3] if v[3] else 'не указана',
         'experience': v[4] if v[4] else 'не указан',
         'url': v[5],
-        'published_at': v[6] if v[6] else 'не указана'
+        'description': v[6] if v[6] else '',  # Добавляем описание
+        'published_at': v[7] if v[7] else 'не указана'
     } for v in vacancies]
 
 

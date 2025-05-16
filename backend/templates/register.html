@@ -11,7 +11,7 @@
                     <h4>Регистрация</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('register') }}">
+                    <form method="POST" action="{{ url_for('register') }}" onsubmit="return validateForm()">
                         <div class="mb-3">
                             <label for="user_type" class="form-label">Тип пользователя</label>
                             <select class="form-select" id="user_type" name="user_type" required>
@@ -19,33 +19,30 @@
                                 <option value="university">Представитель университета</option>
                             </select>
                         </div>
-
                         <div class="mb-3">
-                            <label for="full_name" class="form-label">ФИО</label>
-                            <input type="text" class="form-control" id="full_name" name="full_name" required>
+                            <label for="full_name" class="form-label">ФИО (без цифр)</label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" required
+                                   pattern="[^\d]*" title="ФИО не должно содержать цифры">
                         </div>
-
                         <div class="mb-3" id="group_number_field">
                             <label for="group_number" class="form-label">Номер группы (3 цифры)</label>
                             <input type="text" class="form-control" id="group_number" name="group_number"
                                    pattern="\d{3}" title="Введите трехзначный номер группы">
                         </div>
-
                         <div class="mb-3 d-none" id="registration_code_field">
                             <label for="registration_code" class="form-label">Код регистрации</label>
                             <input type="text" class="form-control" id="registration_code" name="registration_code">
                         </div>
-
                         <div class="mb-3">
-                            <label for="password" class="form-label">Пароль</label>
-                            <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                            <label for="password" class="form-label">Пароль (минимум 6 символов)</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   required minlength="6">
                         </div>
-
                         <div class="mb-3">
                             <label for="confirm_password" class="form-label">Подтвердите пароль</label>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="6">
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password"
+                                   required minlength="6">
                         </div>
-
                         <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
                     </form>
                 </div>
@@ -58,18 +55,63 @@
 </div>
 
 <script>
-    document.getElementById('user_type').addEventListener('change', function() {
-        const userType = this.value;
-        const groupField = document.getElementById('group_number_field');
-        const codeField = document.getElementById('registration_code_field');
+document.getElementById('user_type').addEventListener('change', function() {
+    const userType = this.value;
+    const groupField = document.getElementById('group_number_field');
+    const codeField = document.getElementById('registration_code_field');
 
-        if (userType === 'student') {
-            groupField.classList.remove('d-none');
-            codeField.classList.add('d-none');
-        } else {
-            groupField.classList.add('d-none');
-            codeField.classList.remove('d-none');
+    if (userType === 'student') {
+        groupField.classList.remove('d-none');
+        codeField.classList.add('d-none');
+    } else {
+        groupField.classList.add('d-none');
+        codeField.classList.remove('d-none');
+    }
+});
+
+function validateForm() {
+    const fullName = document.getElementById('full_name').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    const userType = document.getElementById('user_type').value;
+
+    // Проверка на цифры в ФИО
+    if (/\d/.test(fullName)) {
+        alert('ФИО не должно содержать цифры');
+        return false;
+    }
+
+    // Проверка длины пароля
+    if (password.length < 6) {
+        alert('Пароль должен содержать не менее 6 символов');
+        return false;
+    }
+
+    // Проверка совпадения паролей
+    if (password !== confirmPassword) {
+        alert('Пароли не совпадают');
+        return false;
+    }
+
+    // Проверка кода регистрации для университета
+    if (userType === 'university') {
+        const regCode = document.getElementById('registration_code').value;
+        if (regCode !== '987654321') {
+            alert('Неверный код регистрации');
+            return false;
         }
-    });
+    }
+
+    // Проверка номера группы для студентов
+    if (userType === 'student') {
+        const groupNumber = document.getElementById('group_number').value;
+        if (!/^\d{3}$/.test(groupNumber)) {
+            alert('Номер группы должен состоять из 3 цифр');
+            return false;
+        }
+    }
+
+    return true;
+}
 </script>
 {% endblock %}

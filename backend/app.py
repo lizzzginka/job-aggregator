@@ -113,6 +113,11 @@ def register():
         registration_code = request.form.get('registration_code', '')
 
         errors = []
+        # Проверка ФИО на наличие цифр
+        if any(char.isdigit() for char in full_name):
+            errors.append('ФИО не должно содержать цифры')
+
+
 
         # Валидация данных
         if not full_name:
@@ -148,9 +153,24 @@ def register():
             flash(error, 'danger')
 
     return render_template('register.html')
+
+
 @app.route('/')
 def index():
-    vacancies = get_vacancies()
+    search_query = request.args.get('search', '').lower()
+    all_vacancies = get_vacancies()
+
+    if search_query:
+        vacancies = []
+        for v in all_vacancies:
+            # Проверяем наличие ключевых слов в разных полях вакансии
+            if (search_query in v['title'].lower() or
+                search_query in v['company'].lower() or
+                (v.get('description') and search_query in v['description'].lower())):
+                vacancies.append(v)
+    else:
+        vacancies = all_vacancies
+
     user = None
     if 'user_id' in session:
         user = get_user_by_id(session['user_id'])
@@ -162,11 +182,11 @@ def index():
         favorites = [v['id'] for v in get_favorites(user['id'])]
 
     return render_template('index.html',
-                           vacancies=vacancies,
-                           user=user,
-                           employment=employment,
-                           favorites=favorites)
-
+                         vacancies=vacancies,
+                         user=user,
+                         employment=employment,
+                         favorites=favorites,
+                         search_query=search_query)
 
 @app.route('/favorites')
 def favorites():
@@ -409,4 +429,5 @@ def get_user_by_id(user_id):
 
 if __name__ == '__main__':
     update_vacancies()
-    app.run(debug=True)
+    #app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)  # Важно!

@@ -10,45 +10,79 @@
         {% endif %}
     </div>
 
-    <div class="row">
-        {% for vacancy in vacancies %}
-            <div class="col-md-6 mb-4">
-                <div class="card {% if employment and employment.id == vacancy.id %}border-success{% endif %}">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ vacancy.title }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ vacancy.company }}</h6>
-                        <div class="card-text mb-2">
-                            <strong>Зарплата:</strong> {{ vacancy.salary }}<br>
-                            <strong>Дата публикации:</strong> {{ vacancy.published_at }}<br>
-                            <strong>Ссылка:</strong> <a href="{{ vacancy.url }}" target="_blank">{{ vacancy.url|truncate(30) }}</a>
-                        </div>
+    <div class="mb-3">
+        {% if search_query %}
+            <p>Результаты поиска по запросу "{{ search_query }}": найдено {{ vacancies|length }} вакансий</p>
+        {% else %}
+            <p>Найдено вакансий: {{ vacancies|length }}</p>
+        {% endif %}
+    </div>
 
-                        <div class="d-flex justify-content-between align-items-center">
-                            <button class="btn btn-sm {% if vacancy.id in favorites %}btn-warning{% else %}btn-outline-warning{% endif %} favorite-btn"
-                                    data-vacancy-id="{{ vacancy.id }}">
-                                {% if vacancy.id in favorites %}
-                                    <i class="bi bi-star-fill"></i> В избранном
-                                {% else %}
-                                    <i class="bi bi-star"></i> Добавить в избранное
-                                {% endif %}
-                            </button>
+    <div class="mb-4">
+        <form method="GET" action="{{ url_for('index') }}" class="row g-3">
+            <div class="col-md-8">
+                <input type="text" name="search" class="form-control"
+                       placeholder="Введите ключевое слово (например, 'разработчик')"
+                       value="{{ request.args.get('search', '') }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Поиск</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary w-100">Сбросить</a>
+            </div>
+        </form>
+    </div>
 
-                            {% if user and user.user_type == 'student' %}
-                                <button class="btn btn-sm {% if employment and employment.id == vacancy.id %}btn-success{% else %}btn-outline-success{% endif %} employment-btn"
+    {% if vacancies %}
+        <div class="row">
+            {% for vacancy in vacancies %}
+                <div class="col-md-6 mb-4">
+                    <div class="card {% if employment and employment.id == vacancy.id %}border-success{% endif %}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ vacancy.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ vacancy.company }}</h6>
+                            <div class="card-text mb-2">
+                                <strong>Зарплата:</strong> {{ vacancy.salary }}<br>
+                                <strong>Дата публикации:</strong> {{ vacancy.published_at }}<br>
+                                <strong>Ссылка:</strong> <a href="{{ vacancy.url }}" target="_blank">{{ vacancy.url|truncate(30) }}</a>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button class="btn btn-sm {% if vacancy.id in favorites %}btn-warning{% else %}btn-outline-warning{% endif %} favorite-btn"
                                         data-vacancy-id="{{ vacancy.id }}">
-                                    {% if employment and employment.id == vacancy.id %}
-                                        <i class="bi bi-check-circle"></i> Отмечено
+                                    {% if vacancy.id in favorites %}
+                                        <i class="bi bi-star-fill"></i> В избранном
                                     {% else %}
-                                        Отметить трудоустройство
+                                        <i class="bi bi-star"></i> Добавить в избранное
                                     {% endif %}
                                 </button>
-                            {% endif %}
+
+                                {% if user and user.user_type == 'student' %}
+                                    <button class="btn btn-sm {% if employment and employment.id == vacancy.id %}btn-success{% else %}btn-outline-success{% endif %} employment-btn"
+                                            data-vacancy-id="{{ vacancy.id }}">
+                                        {% if employment and employment.id == vacancy.id %}
+                                            <i class="bi bi-check-circle"></i> Отмечено
+                                        {% else %}
+                                            Отметить трудоустройство
+                                        {% endif %}
+                                    </button>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            {% if search_query %}
+                По вашему запросу "{{ search_query }}" вакансий не найдено.
+            {% else %}
+                Нет доступных вакансий.
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}
