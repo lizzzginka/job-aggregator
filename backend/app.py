@@ -8,7 +8,8 @@ from db import (
     init_db, add_vacancies, get_vacancies, get_vacancy_by_id,
     add_user, get_user, update_user_login, init_db, get_all_users,
     add_favorite, remove_favorite, get_favorites, is_favorite,
-    set_employment, remove_employment, get_employment, get_all_employments
+    set_employment, remove_employment, get_employment, get_all_employments,
+    get_all_students_with_last_login
 )
 from datetime import datetime, timedelta
 
@@ -53,7 +54,7 @@ def login():
         full_name = request.form.get('full_name')
         password = request.form.get('password')
         user_type = request.form.get('user_type')
-        group_number = request.form.get('group_number', None)  # Добавляем группу для студентов
+        group_number = request.form.get('group_number', None)
 
         user = get_user(full_name, password, user_type)
 
@@ -64,6 +65,8 @@ def login():
 
         if user:
             session['user_id'] = user['id']
+            # Обновляем время последнего входа
+            update_user_login(user['id'])
             return redirect(url_for('index'))
         else:
             flash('Неверные данные для входа', 'danger')
@@ -316,26 +319,24 @@ def user_activity():
 
     students = get_all_students_with_last_login()
 
-    # Конвертируем время в челябинское
+    # Форматируем время для отображения
     for student in students:
         if student['last_login']:
             try:
-                # Парсим время с учетом возможных форматов
-                if 'T' in student['last_login']:
-                    dt = datetime.strptime(student['last_login'], '%Y-%m-%dT%H:%M:%S.%f')
-                else:
-                    dt = datetime.strptime(student['last_login'], '%Y-%m-%d %H:%M:%S')
-
-                utc_time = pytz.utc.localize(dt)
-                local_time = utc_time.astimezone(chelyabinsk_tz)
-                student['last_login'] = local_time.strftime('%d.%m.%Y %H:%M')
+                # Убираем 'T' и миллисекунды, если они есть
+                dt_str = student['last_login'].replace('T', ' ').split('.')[0]
+                # Преобразуем в красивый формат (дд.мм.гггг чч:мм)
+                dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+                student['last_login'] = dt.strftime('%d.%m.%Y %H:%M')
             except ValueError as e:
                 student['last_login'] = 'Неверный формат времени'
                 print(f"Ошибка форматирования времени: {e}")
+        else:
+            student['last_login'] = 'Никогда'
 
     return render_template('user_activity.html',
-                           students=students,
-                           user=user)
+                         students=students,
+                         user=user)
 @app.route('/employment_report')
 def employment_report():
     if 'user_id' not in session:
@@ -347,23 +348,6 @@ def employment_report():
 
     employments = get_all_employments()
     return render_template('employment_report.html', employments=employments, user=user)
-
-def get_all_students_with_last_login():
-    conn = sqlite3.connect('vacancies.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT full_name, group_number, last_login 
-        FROM users 
-        WHERE user_type = 'student'
-        ORDER BY group_number, full_name
-    ''')
-    students = cursor.fetchall()
-    conn.close()
-    return [{
-        'full_name': s[0],
-        'group_number': s[1],
-        'last_login': s[2]
-    } for s in students]
 
 def get_all_employments():
     conn = sqlite3.connect('vacancies.db')
@@ -396,14 +380,19 @@ def download_employment_report():
 
     employments = get_all_employments()
 
-    # Создаем CSV без pandas
+    # Создаем CSV с правильной кодировкой и BOM (для Excel)
     output = StringIO()
+    output.write('\ufeff')  # Добавляем BOM для корректного отображения в Excel
     output.write("Группа,ФИО студента,Компания,Ссылка на вакансию\n")
+
     for emp in employments:
-        output.write(f"{emp['group_number']},{emp['full_name']},{emp['company']},{emp['url']}\n")
+        line = f"{emp['group_number']},{emp['full_name']},{emp['company']},{emp['url']}\n"
+        output.write(line)
 
     response = make_response(output.getvalue())
-    response.headers['Content-Type'] = 'text/csv'
+
+    # Устанавливаем правильные заголовки
+    response.headers['Content-Type'] = 'text/csv; charset=utf-8-sig'
     response.headers['Content-Disposition'] = 'attachment; filename=employment_report.csv'
 
     return response
@@ -430,4 +419,4 @@ def get_user_by_id(user_id):
 if __name__ == '__main__':
     update_vacancies()
     #app.run(debug=True)
-    app.run(host='0.0.0.0', port=5000)  # Важно!
+    app.run(host='0.0.0.0', port=5000)

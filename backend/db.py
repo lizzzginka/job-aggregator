@@ -60,6 +60,12 @@ def init_db():
             UNIQUE(user_id)
         )
     ''')
+    # Добавляем столбец last_login, если его нет
+    cursor.execute("PRAGMA table_info(users)")
+    columns = [column[1] for column in cursor.fetchall()]
+    if 'last_login' not in columns:
+        cursor.execute('ALTER TABLE users ADD COLUMN last_login TEXT')
+        conn.commit()
 
     conn.commit()
     conn.close()
@@ -139,17 +145,17 @@ def get_all_students_with_last_login():
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
     cursor.execute('''
-        SELECT full_name, group_number, last_login 
-        FROM users 
-        WHERE user_type = 'student'
-        ORDER BY group_number, full_name
+    SELECT full_name, group_number, last_login
+    FROM users
+    WHERE user_type = 'student'
+    ORDER BY group_number, full_name
     ''')
     students = cursor.fetchall()
     conn.close()
     return [{
         'full_name': s[0],
         'group_number': s[1],
-        'last_login': s[2]
+        'last_login': s[2] if s[2] else None
     } for s in students]
 
 def get_user_by_id(user_id):
@@ -195,9 +201,10 @@ def get_user(full_name, password, user_type):
 def update_user_login(user_id):
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
+    # Сохраняем время в формате 'YYYY-MM-DD HH:MM:SS'
     cursor.execute('''
         UPDATE users SET last_login = ? WHERE id = ?
-    ''', (datetime.now().isoformat(), user_id))
+    ''', (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), user_id))
     conn.commit()
     conn.close()
 
