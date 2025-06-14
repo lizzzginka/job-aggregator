@@ -49,3 +49,71 @@
         </div>
     {% endif %}
 {% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Обработка удаления из избранного
+        $('.remove-favorite').click(function() {
+            const btn = $(this);
+            const vacancyId = btn.data('vacancy-id');
+
+            if (confirm('Удалить вакансию из избранного?')) {
+                $.ajax({
+                    url: '/remove_favorite/' + vacancyId,
+                    method: 'POST',
+                    success: function(response) {
+                        if (response.status === 'removed') {
+                            btn.closest('.col-md-6').fadeOut();
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('Ошибка: ' + (xhr.responseJSON?.error || 'Не удалось удалить вакансию'));
+                    }
+                });
+            }
+        });
+
+        $('.employment-btn').click(function() {
+            const btn = $(this);
+            const vacancyId = btn.data('vacancy-id');
+            const isEmployed = btn.hasClass('btn-success');
+
+            if (isEmployed) {
+                if (confirm('Отменить отметку о трудоустройстве?')) {
+                    $.ajax({
+                        url: '/remove_employment',
+                        method: 'POST',
+                        success: function() {
+                            location.reload();
+                        }
+                    });
+                }
+            } else {
+                $.ajax({
+                    url: '/set_employment/' + vacancyId,
+                    method: 'POST',
+                    success: function(response) {
+                        if (response.error) {
+                            alert(response.error);
+                            // Подсветка уже отмеченной вакансии
+                            if (response.marked_vacancy_id) {
+                                $('.employment-btn[data-vacancy-id="' + response.marked_vacancy_id + '"]')
+                                    .addClass('bg-warning');
+                                setTimeout(() => {
+                                    $('.bg-warning').removeClass('bg-warning');
+                                    }, 3000);
+                            }
+                        } else {
+                            location.reload();
+                        }
+                        },
+                    error: function(xhr) {
+                        alert('Ошибка: ' + (xhr.responseJSON?.error || 'Неизвестная ошибка'));
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

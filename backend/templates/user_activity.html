@@ -6,8 +6,15 @@
 <div class="container mt-4">
     <h1 class="mb-4">Активность студентов</h1>
 
+    {% if user.user_type == 'university' %}
+    <div class="mb-3">
+        <button id="archive-btn" class="btn btn-warning">Добавить студентов в архив</button>
+        <button id="show-archive-btn" class="btn btn-secondary">Архив</button>
+    </div>
+    {% endif %}
+
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="active-students-table">
             <thead class="table-dark">
                 <tr>
                     <th>Группа</th>
@@ -26,5 +33,127 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Таблица архива (изначально скрыта) -->
+    <div id="archive-table" class="table-responsive mt-4" style="display: none;">
+        <h3>Архив студентов</h3>
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Группа</th>
+                    <th>ФИО студента</th>
+                    <th>Был в сети (Челябинск UTC+5)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Данные будут загружаться динамически -->
+            </tbody>
+        </table>
+    </div>
 </div>
+
+{% if user.user_type == 'university' %}
+<script>
+    // Функция для загрузки и отображения архивных студентов
+    async function loadArchiveStudents() {
+        try {
+            const response = await fetch('/get_archived_students');
+            if (!response.ok) throw new Error('Ошибка сервера');
+
+            const students = await response.json();
+            const tbody = document.querySelector('#archive-table tbody');
+            tbody.innerHTML = '';
+
+            if (students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center">Архив пуст</td></tr>';
+            } else {
+                students.forEach(student => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${student.group_number || ''}</td>
+                        <td>${student.full_name}</td>
+                        <td>${student.last_login || 'Никогда'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки архива:', error);
+            alert('Не удалось загрузить архив студентов');
+        }
+    }
+
+    // Обработчик кнопки "Архив"
+    document.getElementById('show-archive-btn').addEventListener('click', async function() {
+        const archiveTable = document.getElementById('archive-table');
+        const btn = this;
+
+        if (archiveTable.style.display === 'none') {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Загрузка...';
+
+            await loadArchiveStudents();
+
+            archiveTable.style.display = 'block';
+            btn.textContent = 'Скрыть архив';
+            btn.disabled = false;
+        } else {
+            archiveTable.style.display = 'none';
+            btn.textContent = 'Архив';
+        }
+    });
+
+    // Обработчик кнопки "Добавить в архив"
+    document.getElementById('archive-btn').addEventListener('click', async function() {
+        if (!confirm('Вы уверены, что хотите архивировать всех студентов?')) return;
+
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Архивация...';
+
+        try {
+            const response = await fetch('/archive_students', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'success') {
+                alert(`Успешно архивировано ${result.archived_count} студентов`);
+
+                // Обновляем таблицу активных студентов
+                const activeResponse = await fetch('/get_active_students');
+                const activeStudents = await activeResponse.json();
+
+                const activeTbody = document.querySelector('#active-students-table tbody');
+                activeTbody.innerHTML = '';
+
+                activeStudents.forEach(student => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${student.group_number || ''}</td>
+                        <td>${student.full_name}</td>
+                        <td>${student.last_login || 'Никогда'}</td>
+                    `;
+                    activeTbody.appendChild(row);
+                });
+
+                // Если архив открыт - обновляем его
+                if (document.getElementById('archive-table').style.display === 'block') {
+                    await loadArchiveStudents();
+                }
+            } else {
+                alert(result.error || 'Ошибка при архивации');
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Ошибка при выполнении запроса');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Добавить студентов в архив';
+        }
+    });
+</script>
+{% endif %}
 {% endblock %}

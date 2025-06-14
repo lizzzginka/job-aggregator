@@ -116,7 +116,6 @@
                 const btn = $(this);
                 const vacancyId = btn.data('vacancy-id');
                 const isEmployed = btn.hasClass('btn-success');
-
                 if (isEmployed) {
                     if (confirm('Отменить отметку о трудоустройстве?')) {
                         $.ajax({
@@ -128,19 +127,28 @@
                         });
                     }
                 } else {
-                    if (confirm('Подтвердить отметку о трудоустройстве?')) {
-                        $.ajax({
-                            url: '/set_employment/' + vacancyId,
-                            method: 'POST',
-                            success: function(response) {
-                                if (response.error) {
-                                    alert(response.error);
-                                } else {
-                                    location.reload();
+                    $.ajax({
+                        url: '/set_employment/' + vacancyId,
+                        method: 'POST',
+                        success: function(response) {
+                            if (response.error) {
+                                alert(response.error);
+                                if (response.marked_vacancy_id) {
+                                    // Подсветка уже отмеченной вакансии
+                                    $('.employment-btn[data-vacancy-id="' + response.marked_vacancy_id + '"]')
+                                        .addClass('bg-warning');
+                                    setTimeout(() => {
+                                        $('.bg-warning').removeClass('bg-warning');
+                                        }, 3000);
                                 }
+                            } else {
+                                location.reload();
                             }
-                        });
-                    }
+                            },
+                        error: function(xhr) {
+                            alert('Ошибка: ' + (xhr.responseJSON?.error || 'Не удалось отметить вакансию'));
+                        }
+                    });
                 }
             });
         });

@@ -175,20 +175,26 @@
                         success: function(response) {
                             if (response.error) {
                                 alert(response.error);
-                            if (response.error.includes('отметили')) {
+                                if (response.marked_vacancy_id) {
+                                    // Подсветка уже отмеченной вакансии
+                                    $('.employment-btn[data-vacancy-id="' + response.marked_vacancy_id + '"]')
+                                        .addClass('bg-warning');
+                                    setTimeout(() => {
+                                        $('.bg-warning').removeClass('bg-warning');
+                                    }, 3000);
+                                }
+                            } else {
                                 location.reload();
                             }
-                        } else {
-                            btn.removeClass('btn-outline-success').addClass('btn-success')
-                                .text('Отмечено');
-                            location.reload();
+                        },
+                        error: function(xhr) {
+                            alert('Ошибка: ' + (xhr.responseJSON?.error || 'Не удалось отметить вакансию'));
                         }
-                    }
-                });
+                    });
+                }
             }
-        }
+        });
     });
-});
-</script>
+    </script>
 </body>
 </html>

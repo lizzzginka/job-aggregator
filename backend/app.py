@@ -9,7 +9,7 @@ from db import (
     add_user, get_user, update_user_login, init_db, get_all_users,
     add_favorite, remove_favorite, get_favorites, is_favorite,
     set_employment, remove_employment, get_employment, get_all_employments,
-    get_all_students_with_last_login
+    get_all_students_with_last_login, get_archived_students, archive_student, is_archived
 )
 from datetime import datetime, timedelta
 
@@ -161,16 +161,16 @@ def register():
 @app.route('/')
 def index():
     search_query = request.args.get('search', '').lower()
-    all_vacancies = get_vacancies()
+    all_vacancies = get_vacancies()  # Теперь get_vacancies() уже возвращает отфильтрованные данные
 
+    # Фильтрация по поисковому запросу
     if search_query:
-        vacancies = []
-        for v in all_vacancies:
-            # Проверяем наличие ключевых слов в разных полях вакансии
+        vacancies = [
+            v for v in all_vacancies
             if (search_query in v['title'].lower() or
                 search_query in v['company'].lower() or
-                (v.get('description') and search_query in v['description'].lower())):
-                vacancies.append(v)
+                (v.get('description') and search_query in v['description'].lower()))
+        ]
     else:
         vacancies = all_vacancies
 
@@ -190,7 +190,6 @@ def index():
                          employment=employment,
                          favorites=favorites,
                          search_query=search_query)
-
 @app.route('/favorites')
 def favorites():
     if 'user_id' not in session:
@@ -252,7 +251,10 @@ def set_employment_route(vacancy_id):
 
     current_employment = get_employment(user['id'])
     if current_employment:
-        return jsonify({'error': 'Вы уже отметили вакансию на трудоустройство'}), 400
+        return jsonify({
+            'error': 'Вы уже отметили вакансию на трудоустройство',
+            'marked_vacancy_id': current_employment['vacancy_id']
+        }), 400
 
     # Добавляем в избранное, если еще не добавлена
     if not is_favorite(user['id'], vacancy_id):
@@ -313,30 +315,32 @@ def user_activity():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    user = get_user_by_id(session['user_id'])
-    if not user or user['user_type'] != 'university':
+    try:
+        user = get_user_by_id(session['user_id'])
+        if not user or user['user_type'] != 'university':
+            return redirect(url_for('index'))
+
+        students = [s for s in get_all_students_with_last_login() if not is_archived(s['id'])]
+
+        for student in students:
+            if student['last_login']:
+                try:
+                    dt_str = student['last_login'].replace('T', ' ').split('.')[0]
+                    dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+                    student['last_login'] = dt.strftime('%d.%m.%Y %H:%M')
+                except ValueError as e:
+                    student['last_login'] = 'Неверный формат времени'
+                    print(f"Ошибка форматирования времени: {e}")
+            else:
+                student['last_login'] = 'Никогда'
+
+        return render_template('user_activity.html',
+                            students=students,
+                            user=user)
+    except Exception as e:
+        print(f"Ошибка в user_activity: {str(e)}")
+        flash('Произошла ошибка при загрузке страницы активности', 'danger')
         return redirect(url_for('index'))
-
-    students = get_all_students_with_last_login()
-
-    # Форматируем время для отображения
-    for student in students:
-        if student['last_login']:
-            try:
-                # Убираем 'T' и миллисекунды, если они есть
-                dt_str = student['last_login'].replace('T', ' ').split('.')[0]
-                # Преобразуем в красивый формат (дд.мм.гггг чч:мм)
-                dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
-                student['last_login'] = dt.strftime('%d.%m.%Y %H:%M')
-            except ValueError as e:
-                student['last_login'] = 'Неверный формат времени'
-                print(f"Ошибка форматирования времени: {e}")
-        else:
-            student['last_login'] = 'Никогда'
-
-    return render_template('user_activity.html',
-                         students=students,
-                         user=user)
 @app.route('/employment_report')
 def employment_report():
     if 'user_id' not in session:
@@ -414,6 +418,145 @@ def get_user_by_id(user_id):
             'user_type': user[3]
         }
     return None
+
+
+def archive_student(user_id):
+    """Добавляет студента в архив"""
+    conn = sqlite3.connect('vacancies.db')
+    cursor = conn.cursor()
+    try:
+        # Проверяем, не архивирован ли уже студент
+        cursor.execute('SELECT 1 FROM archived_students WHERE user_id = ?', (user_id,))
+        if cursor.fetchone():
+            return False  # Уже в архиве
+
+        cursor.execute('INSERT INTO archived_students (user_id) VALUES (?)', (user_id,))
+        conn.commit()
+        return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        print(f"Ошибка при архивации студента {user_id}: {e}")
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
+
+@app.route('/archive_students', methods=['POST'])
+def archive_students():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    user = get_user_by_id(session['user_id'])
+    if not user or user['user_type'] != 'university':
+        return jsonify({'error': 'Forbidden'}), 403
+
+    try:
+        # Получаем только активных студентов (не в архиве)
+        active_students = [s for s in get_all_students_with_last_login()
+                           if not is_archived(s['id'])]
+
+        if not active_students:
+            return jsonify({'error': 'Нет активных студентов для архивации'}), 400
+
+        success_count = 0
+        failed_ids = []
+
+        for student in active_students:
+            if not archive_student(student['id']):
+                failed_ids.append(student['id'])
+            else:
+                success_count += 1
+
+        if success_count == 0:
+            return jsonify({
+                'error': 'Не удалось архивировать ни одного студента',
+                'failed_ids': failed_ids
+            }), 400
+
+        # Возвращаем обновленные списки
+        return jsonify({
+            'status': 'success',
+            'archived_count': success_count,
+            'failed_count': len(failed_ids),
+            'active_students': len([s for s in get_all_students_with_last_login()
+                                    if not is_archived(s['id'])]),
+            'archived_students': len(get_archived_students())
+        })
+    except Exception as e:
+        print(f"Ошибка в archive_students: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+def is_archived(user_id):
+    conn = sqlite3.connect('vacancies.db')
+    cursor = conn.cursor()
+    try:
+        # Проверяем существование таблицы
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='archived_students'")
+        if not cursor.fetchone():
+            return False
+
+        cursor.execute('SELECT 1 FROM archived_students WHERE user_id = ?', (user_id,))
+        return cursor.fetchone() is not None
+    except sqlite3.Error as e:
+        print(f"Ошибка при проверке архивации: {e}")
+        return False
+    finally:
+        conn.close()
+
+
+@app.route('/get_active_students')
+def get_active_students():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    user = get_user_by_id(session['user_id'])
+    if not user or user['user_type'] != 'university':
+        return jsonify({'error': 'Forbidden'}), 403
+
+    try:
+        students = [s for s in get_all_students_with_last_login()
+                    if not is_archived(s['id'])]
+
+        # Форматируем дату
+        for student in students:
+            if student['last_login']:
+                try:
+                    dt_str = student['last_login'].replace('T', ' ').split('.')[0]
+                    dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+                    student['last_login'] = dt.strftime('%d.%m.%Y %H:%M')
+                except ValueError:
+                    student['last_login'] = 'Неверный формат'
+
+        return jsonify(students)
+    except Exception as e:
+        print(f"Ошибка в get_active_students: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+@app.route('/get_archived_students')
+def get_archived_students_route():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    user = get_user_by_id(session['user_id'])
+    if not user or user['user_type'] != 'university':
+        return jsonify({'error': 'Forbidden'}), 403
+
+    try:
+        archived = get_archived_students()
+        # Форматируем дату последнего входа
+        for student in archived:
+            if student['last_login']:
+                try:
+                    dt_str = student['last_login'].replace('T', ' ').split('.')[0]
+                    dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+                    student['last_login'] = dt.strftime('%d.%m.%Y %H:%M')
+                except ValueError:
+                    student['last_login'] = 'Неверный формат'
+        return jsonify(archived)
+    except Exception as e:
+        print(f"Ошибка в get_archived_students: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 if __name__ == '__main__':
