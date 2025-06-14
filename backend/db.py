@@ -98,44 +98,74 @@ def add_vacancies(vacancies):
 def get_vacancies():
     conn = sqlite3.connect('vacancies.db')
     cursor = conn.cursor()
-    cursor.execute('''
-        SELECT id, title, company, salary, experience, url, description, published_at 
-        FROM vacancies
-        ORDER BY published_at DESC
-    ''')
-    vacancies = cursor.fetchall()
-    conn.close()
 
-    filtered = []
-    for v in vacancies:
-        try:
-            # Парсим дату (поддерживаем разные форматы)
-            if v[7] and isinstance(v[7], str):
-                if 'T' in v[7]:  # Формат ISO (2025-06-14T20:52:22+05:00)
-                    pub_date = datetime.strptime(v[7], '%Y-%m-%dT%H:%M:%S%z')
-                else:  # Другие форматы
+    try:
+        # Получаем все вакансии с их датами
+        cursor.execute('''
+            SELECT id, title, company, salary, experience, url, description, published_at 
+            FROM vacancies
+        ''')
+        vacancies = cursor.fetchall()
+
+        # Парсим даты и создаем список для сортировки
+        parsed_vacancies = []
+        for v in vacancies:
+            try:
+                pub_date_str = v[7]
+                if not pub_date_str:
+                    continue
+
+                # Парсим разные форматы дат
+                if 'T' in pub_date_str:  # ISO формат (2025-06-14T20:52:22+05:00)
+                    pub_date = datetime.strptime(pub_date_str, '%Y-%m-%dT%H:%M:%S%z')
+                elif '.' in pub_date_str and ':' in pub_date_str:  # DD.MM.YYYY HH:MM
+                    pub_date = datetime.strptime(pub_date_str, '%d.%m.%Y %H:%M')
+                else:  # Пробуем другие возможные форматы
                     try:
-                        pub_date = datetime.strptime(v[7], '%d.%m.%Y %H:%M')
+                        pub_date = datetime.strptime(pub_date_str, '%Y-%m-%d %H:%M:%S')
                     except ValueError:
-                        pub_date = datetime.strptime(v[7], '%Y-%m-%d %H:%M:%S')
+                        continue
 
-                # Фильтруем по дате (последние 30 дней)
-                if (datetime.now(pub_date.tzinfo) - pub_date).days <= 30:
-                    filtered.append({
-                        'id': v[0],
-                        'title': v[1],
-                        'company': v[2],
-                        'salary': v[3] if v[3] else 'не указана',
-                        'experience': v[4] if v[4] else 'не указан',
-                        'url': v[5],
-                        'description': v[6] if v[6] else '',
-                        'published_at': pub_date.strftime('%d.%m.%Y %H:%M')
-                    })
-        except Exception as e:
-            print(f"Ошибка обработки вакансии {v[0]}: {str(e)}")
+                parsed_vacancies.append({
+                    'id': v[0],
+                    'title': v[1],
+                    'company': v[2],
+                    'salary': v[3] if v[3] else 'не указана',
+                    'experience': v[4] if v[4] else 'не указан',
+                    'url': v[5],
+                    'description': v[6] if v[6] else '',
+                    'published_at': pub_date,
+                    'original_date_str': pub_date_str
+                })
+            except Exception as e:
+                print(f"Ошибка обработки вакансии {v[0]}: {str(e)}")
+                continue
 
-    return filtered
+        # Сортируем по дате (новые сначала)
+        parsed_vacancies.sort(key=lambda x: x['published_at'], reverse=True)
 
+        # Фильтруем по дате (последние 30 дней) и форматируем вывод
+        now = datetime.now()
+        filtered = []
+        for v in parsed_vacancies:
+            if (now - v['published_at']).days <= 30:
+                filtered.append({
+                    'id': v['id'],
+                    'title': v['title'],
+                    'company': v['company'],
+                    'salary': v['salary'],
+                    'experience': v['experience'],
+                    'url': v['url'],
+                    'description': v['description'],
+                    'published_at': v['published_at'].strftime('%d.%m.%Y %H:%M')
+                })
+
+        return filtered
+    except sqlite3.Error as e:
+        print(f"Ошибка базы данных: {e}")
+        return []
+    finally:
+        conn.close()
 
 def get_vacancy_by_id(vacancy_id):
     conn = sqlite3.connect('vacancies.db')
